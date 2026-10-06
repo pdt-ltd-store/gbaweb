@@ -1644,6 +1644,43 @@
             background:transparent !important; color:#9A95AD !important;
             border-color:#2E2546 !important;
         }
+
+        /* ---- Card gọn: platform = BADGE trên ảnh, title to rõ, bớt khoảng trống ---- */
+        .platform-badge{
+            position:absolute !important; top:10px; left:10px; z-index:3;
+            background:rgba(11,7,20,.78); color:#EBFA38;
+            border:1px solid rgba(235,250,56,.45); border-radius:999px;
+            padding:4px 11px; font-size:11px; font-weight:800;
+            font-family:'Manrope',sans-serif; letter-spacing:.2px;
+            backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+        }
+        .game-info{ padding:12px 12px 14px !important; }
+        .game-info h3{
+            font-size:15px !important; line-height:1.3 !important;
+            min-height:0 !important; max-height:none !important;
+            margin:0 0 12px !important; text-shadow:none !important; color:#fff !important;
+        }
+        .game-info p{ display:none !important; }   /* dòng Platform cũ nếu còn cache */
+
+        /* ---- Icon search: emoji 🔍 -> SVG kính lúp muted (hết khập khiễng) ---- */
+        .search-bar::after{
+            content:"" !important; text-shadow:none !important;
+            width:18px !important; height:18px !important; right:18px !important;
+            background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239A95AD' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat center !important;
+            background-size:contain !important;
+        }
+
+        /* ---- Lọc Platform/Region hiện trên MOBILE (đang bị display:none) ---- */
+        @media (max-width:768px){
+            .search-bar-row{ flex-wrap:wrap !important; row-gap:10px !important; }
+            .search-bar{ flex:1 1 100% !important; max-width:100% !important; }
+            .filter-inline{
+                display:flex !important; flex:1 1 100% !important; margin-left:0 !important;
+                align-items:center; justify-content:center; flex-wrap:wrap; gap:8px 10px !important;
+            }
+            .filter-inline label{ margin:0 2px 0 0 !important; }
+            .filter-inline select{ min-width:120px; padding:8px 10px !important; }
+        }
     </style>
 </head>
 <body>

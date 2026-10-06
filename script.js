@@ -396,12 +396,12 @@ function displayGames(games) {
         gameItem.innerHTML = isListView ? `
             <div class="game-image-container">
                 <img src="${game.thumbnail}" alt="${game.title}">
+                <div class="platform-badge">${game.platform}</div>
                 ${popularBadge}
                 ${downloadedBadge}
             </div>
             <div class="game-info">
                 <h3>${game.title}</h3>
-                <p><strong>Platform:</strong> ${game.platform}</p>
                 <a href="${game.download_link}" class="download-btn ${downloadedClass}" target="_blank" data-game-id="${game.download_link || game.title}">
                     <span class="download-spinner"></span>
                     <span class="download-text">${downloadText}</span>
@@ -410,12 +410,12 @@ function displayGames(games) {
         ` : `
             <div class="game-image-container">
                 <img src="${game.thumbnail}" alt="${game.title}">
+                <div class="platform-badge">${game.platform}</div>
                 ${popularBadge}
                 ${downloadedBadge}
             </div>
             <div class="game-info">
                 <h3>${game.title}</h3>
-                <p><strong>Platform:</strong> ${game.platform}</p>
                 <a href="${game.download_link}" class="download-btn ${downloadedClass}" target="_blank" data-game-id="${game.download_link || game.title}">
                     <span class="download-spinner"></span>
                     <span class="download-text">${downloadText}</span>
