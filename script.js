@@ -12,7 +12,7 @@ const SESSION_STORAGE_KEY = 'downloadedGames';
 // Session Storage Functions for Download Tracking
 function getDownloadedGames() {
     try {
-        const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
+        const stored = localStorage.getItem(SESSION_STORAGE_KEY);
         return stored ? JSON.parse(stored) : {};
     } catch (e) {
         console.error('Error reading downloaded games from session storage:', e);
@@ -32,11 +32,11 @@ function saveDownloadedGame(game) {
             thumbnail: game.thumbnail,
             downloadedAt: new Date().toISOString()
         };
-        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(downloadedGames));
+        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(downloadedGames));
         console.log(`✅ Saved download state for: ${game.title}`);
         return true;
     } catch (e) {
-        console.error('Error saving downloaded game to session storage:', e);
+        console.error('Error saving downloaded game to localStorage:', e);
         return false;
     }
 }
