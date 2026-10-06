@@ -1588,9 +1588,29 @@
         .search-bar input{
             background:#17122A !important; color:#fff !important;
             border:1px solid #2E2546 !important; border-radius:12px !important;
+            box-shadow:none !important; letter-spacing:normal !important;
+            text-align:left !important; font-family:'Manrope',sans-serif !important;
         }
-        .search-bar input:focus{ border-color:#EBFA38 !important; }
-        .search-bar input::placeholder{ color:#9A95AD !important; }
+        .search-bar input:focus{
+            border-color:#EBFA38 !important;
+            box-shadow:0 0 0 2px rgba(235,250,56,.22) !important; text-align:left !important;
+        }
+        .search-bar input::placeholder{
+            color:#9A95AD !important; font-family:'Manrope',sans-serif !important;
+            font-style:normal !important; letter-spacing:normal !important;
+        }
+        /* Hàng filter Platform/Region: phẳng, bỏ glow/pixel */
+        .filter-inline label{
+            color:#9A95AD !important; text-shadow:none !important;
+            font-family:'Manrope',sans-serif !important;
+        }
+        .filter-inline select{
+            background:#17122A !important; color:#fff !important;
+            border:1px solid #2E2546 !important; border-radius:10px !important;
+            box-shadow:none !important; text-shadow:none !important;
+            font-family:'Manrope',sans-serif !important;
+        }
+        .filter-inline select:focus{ border-color:#EBFA38 !important; box-shadow:none !important; }
         /* Badge */
         .popular-badge{ background:#6C4FD0 !important; color:#fff !important; border-radius:999px !important; }
         .downloaded-badge{ background:#EBFA38 !important; color:#0B0714 !important; border-radius:999px !important; }
