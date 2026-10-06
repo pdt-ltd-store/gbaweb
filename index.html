@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Font theo app: Anton (tiêu đề/nút) + Manrope (nội dung) -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --color-bg: #0f0f0f;
@@ -1532,6 +1534,69 @@
         }
         
 
+    </style>
+    <!-- ===== APP THEME OVERRIDE (vàng #EBFA38 + dark + Anton/Manrope, phẳng bo tròn) ===== -->
+    <style>
+        :root{
+            --color-bg:#0B0714; --color-bg-secondary:#17122A; --color-text:#FFFFFF;
+            --color-accent:#EBFA38; --color-accent2:#6C4FD0;
+            --color-card:#17122A; --color-card-hover:#1C1636;
+            --color-btn:#EBFA38; --color-btn-hover:#6C4FD0;
+            --color-btn-text:#0B0714; --color-btn-text-hover:#FFFFFF; --color-btn-glow:#EBFA38;
+        }
+        /* Font: bỏ pixel, dùng Manrope (nội dung) + Anton (tiêu đề/nút) như app */
+        body, body *{ font-family:'Manrope',-apple-system,"Segoe UI",Roboto,Arial,sans-serif !important; }
+        h1,h2,h3,.game-title,.download-btn,.download-text,.toggle-view-btn,
+        .hot-category-btn,.pagination-btn,.retry-btn{
+            font-family:'Anton',Impact,sans-serif !important; letter-spacing:.5px;
+        }
+        body{
+            background:#0B0714 !important;
+            background-image:
+                radial-gradient(1100px 560px at 50% -10%, rgba(108,79,208,.20), transparent 60%),
+                linear-gradient(180deg,#0B0714 0%,#0E0A18 100%) !important;
+            background-attachment:fixed !important;
+        }
+        /* Nút: phẳng, bo tròn, nền vàng + chữ đen đậm (CTA giống app) */
+        .download-btn,.toggle-view-btn,.hot-category-btn,.pagination-btn,.retry-btn{
+            background:var(--color-accent) !important; color:#0B0714 !important;
+            border:none !important; border-radius:14px !important;
+            box-shadow:none !important; text-transform:uppercase;
+        }
+        .download-btn::before,.download-btn::after{ display:none !important; content:none !important; }
+        .download-btn:hover,.toggle-view-btn:hover,.hot-category-btn:hover,
+        .pagination-btn:hover,.retry-btn:hover{
+            background:#F4FF6A !important; color:#0B0714 !important; transform:translateY(-1px);
+            box-shadow:0 6px 18px rgba(235,250,56,.28) !important;
+        }
+        .pagination-btn.active{ background:#6C4FD0 !important; color:#fff !important; }
+        .download-btn.downloaded{ background:#2E2546 !important; color:#EBFA38 !important; }
+        .download-btn.downloaded:hover{ background:#38305A !important; color:#EBFA38 !important; }
+        /* Thẻ game */
+        .game,.list-item{
+            background:var(--color-card) !important; border:1px solid #2E2546 !important;
+            border-radius:16px !important; box-shadow:0 8px 24px rgba(0,0,0,.35) !important;
+        }
+        .game:hover,.list-item:hover{ border-color:#6C4FD0 !important; }
+        /* Header + ô tìm kiếm */
+        .sticky-search{
+            background:rgba(11,7,20,.92) !important;
+            background-image:none !important;
+            border-bottom:2px solid #2E2546 !important;
+            box-shadow:0 2px 16px rgba(0,0,0,.5) !important;
+        }
+        .search-bar input{
+            background:#17122A !important; color:#fff !important;
+            border:1px solid #2E2546 !important; border-radius:12px !important;
+        }
+        .search-bar input:focus{ border-color:#EBFA38 !important; }
+        .search-bar input::placeholder{ color:#9A95AD !important; }
+        /* Badge */
+        .popular-badge{ background:#6C4FD0 !important; color:#fff !important; border-radius:999px !important; }
+        .downloaded-badge{ background:#EBFA38 !important; color:#0B0714 !important; border-radius:999px !important; }
+        /* Link/accent chung */
+        a{ color:#EBFA38; }
+        ::selection{ background:#EBFA38; color:#0B0714; }
     </style>
 </head>
 <body>
