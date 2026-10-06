@@ -4,1686 +4,379 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Downloads</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <!-- Font theo app: Anton (tiêu đề/nút) + Manrope (nội dung) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Font theo app: Anton (hiển thị) + Manrope (UI/body) -->
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
+        /* =====================================================================
+           Game Downloads — design system app (dark + vàng), mobile-first
+           Palette: bg #0B0714 · surface #17122A · surface-2 #1C1636 · line #2E2546
+                    accent #EBFA38 (tiết chế) · purple #6C4FD0 · muted #9A95AD
+           Font: Manrope (UI/body) + Anton (hiển thị). Không neon / pixel.
+           Lưới 4/8px. Header sticky ~94px (search 40 + filter 36).
+           ===================================================================== */
         :root {
-            --color-bg: #0f0f0f;
-            --color-bg-secondary: #1a1a1a;
-            --color-text: #ffffff;
-            --color-accent: #00d4ff;
-            --color-accent2: #ff6b35;
-            --color-card: #1e1e1e;
-            --color-card-hover: #2a2a2a;
-            --color-btn: #00d4ff;
-            --color-btn-hover: #ff6b35;
-            --color-btn-text: #0f0f0f;
-            --color-btn-text-hover: #fff;
-            --color-btn-glow: #00d4ff;
+            --bg: #0B0714;
+            --surface: #17122A;
+            --surface-2: #1C1636;
+            --line: #2E2546;
+            --accent: #EBFA38;
+            --accent-tint: rgba(235, 250, 56, .10);
+            --accent-line: rgba(235, 250, 56, .38);
+            --purple: #6C4FD0;
+            --text: #FFFFFF;
+            --muted: #9A95AD;
+
+            --r-sm: 10px;
+            --r-md: 12px;
+            --r-lg: 14px;
+            --gap: 10px;
+            --gutter: 12px;
+
+            --font-ui: 'Manrope', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            --font-display: 'Anton', Impact, 'Arial Narrow', sans-serif;
+
+            --ic-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239A95AD' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+            --ic-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239A95AD' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            --ic-download: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11'/%3E%3Cpolyline points='7 11 12 16 17 11'/%3E%3Cpath d='M5 20h14'/%3E%3C/svg%3E");
+            --ic-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='5 13 10 18 19 7'/%3E%3C/svg%3E");
         }
-        body.light-mode {
-            --color-bg: #f6f2ff;
-            --color-bg-secondary: #e9dcff;
-            --color-text: #ffffff;
-            --color-accent: #ff006f;
-            --color-accent2: #00a0c0;
-            --color-card: #280064;
-            --color-card-hover: #3b0a8c;
-            --color-btn: #ff006f;
-            --color-btn-hover: #00a0c0;
-            --color-btn-text: #ffffff;
-            --color-btn-text-hover: #ffffff;
-            --color-btn-glow: #ff70e5;
-        }
-        body, *, a, img, button, input, textarea {
-            -webkit-user-select: none !important;
-            -moz-user-select: none !important;
-            -ms-user-select: none !important;
-            user-select: none !important;
-            -webkit-touch-callout: none !important;
-        }
-        
-        /* Optimized scrolling performance */
-        html {
-            scroll-behavior: smooth;
-        }
-        
+
+        /* ---------- Base ---------- */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
         body {
-            touch-action: pan-y pinch-zoom;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior-y: contain;
-            /* Remove hardware acceleration on mobile to prevent black screen */
-        }
-        
-        /* Allow scrolling on main container */
-        .container {
-            touch-action: pan-y pinch-zoom;
-        }
-        
-        /* Prevent hover-like effects on touch devices */
-        @media (hover: none) {
-            .game {
-                transition: none;
-                will-change: auto;
-            }
-            
-            .download-btn, .toggle-view-btn {
-                transition: none;
-            }
-            
-            /* Add minimal touch feedback */
-            .game:active {
-                opacity: 0.95;
-                transition: opacity 0.05s ease-out;
-            }
-        }
-        
-        /* Performance optimization for mobile */
-        @media (max-width: 768px) {
-            * {
-                -webkit-tap-highlight-color: transparent;
-            }
-            
-            .game {
-                /* Remove hardware acceleration on mobile */
-                backface-visibility: hidden;
-            }
-        }
-        
-        /* Loading spinner animation */
-        .loading-spinner {
-            display: inline-block;
-            animation: spin 2s linear infinite;
-            font-size: 2em;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Error retry button hover effects */
-        .retry-btn {
-            background: var(--color-accent);
-            color: var(--color-btn-text);
-            border: 2px solid var(--color-accent);
-            padding: 12px 24px;
-            border-radius: 0;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 12px;
-            cursor: pointer;
-            box-shadow: 0 4px 0 var(--color-accent2);
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-        }
-        
-        .retry-btn:hover {
-            background: var(--color-accent2);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 var(--color-accent);
-        }
-        
-        .retry-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 0 var(--color-accent2);
-        }
-        body {
-            font-size: 13px;
-            background: var(--color-bg);
-            color: var(--color-text);
-            font-family: 'Press Start 2P', 'Poppins', 'Roboto', Arial, sans-serif;
-            transition: background 0.5s ease, color 0.5s ease;
-            background-image: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            background-attachment: fixed;
-        }
-        .container {
-            padding: 15px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .sticky-search {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(15, 15, 15, 0.9);
-            padding: 20px 0 10px 0;
-            box-shadow: 0 0 15px var(--color-accent), 0 2px 5px rgba(0, 0, 0, 0.2);
-            border-bottom: 4px solid var(--color-accent);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-image: linear-gradient(90deg, rgba(10, 10, 10, 0.95) 0%, rgba(26, 26, 26, 0.95) 100%);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-        .theme-toggle-btn {
-            display: none !important;
-        }
-        /* Loading overlay */
-        #loading-overlay {
-            position: fixed;
-            z-index: 2000;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--color-bg);
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.3s ease;
-            width: 100vw;
-            height: 100vh;
-            flex-direction: column;
-            gap: 20px;
-            opacity: 1;
-            visibility: visible;
-        }
-        #loading-overlay.hide {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-        .loading-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-        .loading-text {
-            color: var(--color-accent);
-            font-size: 1.2em;
-            text-align: center;
-            margin-top: 10px;
-        }
-        .reload-btn {
-            background: linear-gradient(135deg, var(--color-accent), var(--color-accent2));
-            color: var(--color-btn-text);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
-            font-family: inherit;
-        }
-        .reload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
-        }
-        .reload-btn:active {
-            transform: translateY(0);
-        }
-        
-        /* Mobile responsive for loading overlay */
-        @media (max-width: 768px) {
-            .loading-content {
-                gap: 15px;
-            }
-            .loading-text {
-                font-size: 1em;
-                margin-top: 5px;
-            }
-            .reload-btn {
-                padding: 10px 20px;
-                font-size: 0.8em;
-            }
-            
-            /* Disable complex animations on mobile */
-            .game {
-                transition: none;
-            }
-            
-            .download-btn {
-                transition: none;
-            }
-            
-            /* Simplify background for mobile */
-            body {
-                background-image: none;
-                background: var(--color-bg);
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .loading-content {
-                gap: 12px;
-            }
-            .loading-text {
-                font-size: 0.9em;
-            }
-            .reload-btn {
-                padding: 8px 16px;
-                font-size: 0.75em;
-            }
-        }
-        .pixel-spinner {
-            width: 64px;
-            height: 64px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 2px;
-        }
-        .pixel-spinner div {
-            width: 14px;
-            height: 14px;
-            background: var(--color-accent);
-            opacity: 0.7;
-            animation: pixel-blink 1.2s infinite;
-        }
-        .pixel-spinner div:nth-child(1) { animation-delay: 0s; }
-        .pixel-spinner div:nth-child(2) { animation-delay: 0.1s; }
-        .pixel-spinner div:nth-child(3) { animation-delay: 0.2s; }
-        .pixel-spinner div:nth-child(4) { animation-delay: 0.3s; }
-        .pixel-spinner div:nth-child(5) { animation-delay: 0.4s; }
-        .pixel-spinner div:nth-child(6) { animation-delay: 0.5s; }
-        .pixel-spinner div:nth-child(7) { animation-delay: 0.6s; }
-        .pixel-spinner div:nth-child(8) { animation-delay: 0.7s; }
-        .pixel-spinner div:nth-child(9) { animation-delay: 0.8s; }
-        .pixel-spinner div:nth-child(10) { animation-delay: 0.9s; }
-        .pixel-spinner div:nth-child(11) { animation-delay: 1.0s; }
-        .pixel-spinner div:nth-child(12) { animation-delay: 1.1s; }
-        .pixel-spinner div:nth-child(13) { animation-delay: 1.2s; }
-        .pixel-spinner div:nth-child(14) { animation-delay: 1.3s; }
-        .pixel-spinner div:nth-child(15) { animation-delay: 1.4s; }
-        .pixel-spinner div:nth-child(16) { animation-delay: 1.5s; }
-        @keyframes pixel-blink {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 0.2; }
-        }
-        /* Card and button hover/focus effects */
-        .game {
-            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, background 0.1s ease-out;
-        }
-        /* Only apply hover effects on devices that support hover */
-        @media (hover: hover) and (pointer: fine) {
-            .game:hover, .game:focus {
-                background: var(--color-card-hover);
-                transform: translateY(-7px) scale(1.04);
-                box-shadow: 0 12px 0 var(--color-accent);
-            }
-        }
-        
-        /* Touch-friendly active states for mobile */
-        @media (hover: none) {
-            .game:active {
-                background: var(--color-card-hover);
-                transform: translateY(-2px) scale(1.01);
-                box-shadow: 0 6px 0 var(--color-accent);
-                transition: all 0.1s ease;
-            }
-        }
-        .download-btn, .hot-category-btn, .toggle-view-btn {
-            transition: background 0.1s ease-out, color 0.1s ease-out, box-shadow 0.1s ease-out, border 0.1s ease-out;
-        }
-        .download-btn:focus, .hot-category-btn:focus, .toggle-view-btn:focus {
-            outline: 2px solid var(--color-accent2);
-            outline-offset: 2px;
-        }
-        /* General Styling */
-        body {
-            font-size: 13px;
-            background: var(--color-bg);
-            color: var(--color-text);
-            font-family: 'Press Start 2P', 'Poppins', 'Roboto', Arial, sans-serif;
-        }
-        
-        .container {
-            padding: 15px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        /* Search Bar */
-        .sticky-search {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(15, 15, 15, 0.9);
-            padding: 20px 0 10px 0;
-            box-shadow: 0 0 15px var(--color-accent), 0 2px 5px rgba(0, 0, 0, 0.2);
-            border-bottom: 4px solid var(--color-accent);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-image: linear-gradient(90deg, rgba(10, 10, 10, 0.95) 0%, rgba(26, 26, 26, 0.95) 100%);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-        
-        .search-bar-row {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            justify-content: center;
-            width: 100%;
-        }
-        
-        .search-bar {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        
-        .search-bar input {
-            width: 100%;
-            padding: 14px 20px;
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-ui);
             font-size: 14px;
-            border: 3px solid var(--color-accent);
-            border-radius: 8px;
-            background: #1a1a1a;
-            color: #ffffff;
-            font-family: 'Press Start 2P', monospace;
-            outline: none;
-            box-shadow: 0 0 10px var(--color-accent), 0 4px 0 var(--color-accent);
-            letter-spacing: 1px;
-            text-align: center;
+            line-height: 1.4;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            overflow-x: hidden;
         }
-        
-        .search-bar input:focus {
-            border-color: var(--color-accent2);
-            box-shadow: 0 0 15px var(--color-accent2), 0 4px 0 var(--color-accent2);
-            text-align: left;
+        button, input, select { font-family: inherit; }
+        a { color: var(--accent); text-decoration: none; }
+        ::selection { background: var(--accent); color: var(--bg); }
+
+        .container {
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 var(--gutter) calc(24px + env(safe-area-inset-bottom, 0px));
         }
-        
-        .search-bar input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-            font-style: italic;
-            font-family: 'Press Start 2P', monospace;
+
+        /* ---------- Header sticky: search + (Platform | Region) ---------- */
+        .sticky-search {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            margin: 0 calc(var(--gutter) * -1) var(--gutter);
+            padding: 6px var(--gutter) 8px;
+            background: rgba(11, 7, 20, .96);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--line);
         }
-        
-        .filter-inline {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: 12px;
+        .search-bar-row { display: flex; flex-direction: column; gap: 6px; }
+
+        .search-bar { display: flex; align-items: center; gap: 8px; height: 40px; }
+        .search-bar input {
+            flex: 1 1 auto; min-width: 0; height: 40px;
+            padding: 0 40px 0 14px;
+            background: var(--surface) var(--ic-search) no-repeat right 14px center / 18px 18px;
+            color: var(--text);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            font-size: 14px; font-weight: 500;
+            outline: none; box-shadow: none;
+            -webkit-appearance: none; appearance: none;
+            transition: border-color .15s ease;
         }
-        
+        .search-bar input::placeholder { color: var(--muted); opacity: 1; font-weight: 500; }
+        .search-bar input:focus { border-color: var(--accent); }
+
+        /* Nút đổi grid/list: 40x40, icon muted -> vàng khi đang ở list */
+        .toggle-view-btn {
+            flex: 0 0 40px; width: 40px; height: 40px; padding: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--surface); color: var(--muted);
+            border: 1px solid var(--line); border-radius: var(--r-md);
+            cursor: pointer; box-shadow: none;
+            transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+        }
+        .toggle-view-btn.active { color: var(--accent); border-color: var(--accent-line); background: var(--accent-tint); }
+        .toggle-view-btn:active { background: var(--surface-2); }
+        .toggle-view-btn .icon-grid, .toggle-view-btn .icon-list { line-height: 0; }
+        .toggle-view-btn svg { width: 18px; height: 18px; display: block; }
+        .toggle-view-btn svg rect { fill: currentColor; stroke: none; rx: 2px; ry: 2px; }
+
+        /* Filter: 2 select cạnh nhau, nhãn nhỏ nằm trong pill */
+        .filter-inline { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; }
+        .filter-pair {
+            position: relative;
+            display: flex; align-items: center; min-width: 0; height: 36px;
+            padding-left: 10px;
+            background: var(--surface);
+            border: 1px solid var(--line); border-radius: var(--r-sm);
+            transition: border-color .15s ease;
+        }
+        .filter-pair:focus-within { border-color: var(--accent); }
         .filter-inline label {
-            color: var(--color-accent);
-            font-size: 13px;
-            font-family: 'Press Start 2P', monospace;
-            margin-right: 6px;
-            text-shadow: 0 0 5px var(--color-accent);
+            flex: none; margin: 0;
+            color: var(--muted);
+            font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
         }
-        
-        .filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-            margin: 15px 0 0 0;
+        .filter-inline select {
+            flex: 1 1 auto; min-width: 0; height: 100%;
+            padding: 0 26px 0 8px; margin: 0;
+            background: transparent var(--ic-chevron) no-repeat right 8px center / 12px 12px;
+            color: var(--text);
+            border: 0; border-radius: 0; box-shadow: none; outline: none;
+            font-size: 12px; font-weight: 700;
+            text-overflow: ellipsis; white-space: nowrap; overflow: hidden;
+            -webkit-appearance: none; appearance: none;
         }
-        
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .filter-group label {
-            font-size: 13px;
-            margin-bottom: 3px;
-            color: #bdb6c5;
-        }
-        
-        .filter-group select, .filter-group input[type="date"] {
-            padding: 7px 12px;
-            border-radius: 6px;
-            border: 1px solid #3a3240;
-            background: #1e1a22;
-            color: #f3f3f3;
-            font-size: 15px;
-        }
-        
-        /* Optimized responsive grid */
+        .filter-inline select option { background: var(--surface); color: var(--text); }
+
+        /* ---------- Grid card: 2 cột ---------- */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 24px;
-            margin-top: 30px;
-            contain: layout style;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--gap);
         }
-        
         .game {
-            background: #1e1e1e;
-            border: 3px solid var(--color-accent);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.5);
-            transition: all 0.2s ease;
             position: relative;
-            z-index: 1;
+            display: flex; flex-direction: column;
+            min-width: 0;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .28);
+            transition: border-color .15s ease, transform .12s ease;
         }
-        
+        .game:active { transform: scale(.985); }
+
         .game-image-container {
             position: relative;
-            overflow: hidden;
-            border-radius: 8px 8px 0 0;
-        }
-        
-        @media (hover: hover) and (pointer: fine) {
-            .game:hover {
-                transform: translateY(-8px) scale(1.05);
-                box-shadow: 0 15px 35px rgba(0, 212, 255, 0.4), 0 8px 20px rgba(255, 107, 53, 0.3);
-                background: #2a2a2a;
-            }
-        }
-        
-        .game img {
             width: 100%;
-            aspect-ratio: 1/1;
-            max-height: 220px;
-            object-fit: cover;
-            image-rendering: pixelated;
-            background: #0a0a0a;
-            border-bottom: 3px solid var(--color-accent);
-            border-radius: 8px 8px 0 0;
-            display: block;
-            position: relative;
-            z-index: 1;
-            loading: lazy;
-            decoding: async;
-            transition: transform 0.2s ease;
-        }
-        
-        .game-info {
-            padding: 18px 12px 16px 12px;
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .game-info h3 {
-            margin: 0 0 10px;
-            font-size: 0.7em;
-            color: var(--color-text);
-            font-family: 'Press Start 2P', monospace;
-            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
-            font-weight: bold;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
+            aspect-ratio: 5 / 4;
+            background: var(--surface-2);
             overflow: hidden;
-            text-overflow: ellipsis;
-            min-height: 2.2em;
-            max-height: 2.2em;
-            position: relative;
         }
-        
-        .game-info p {
-            margin: 0 0 8px;
-            color: var(--color-accent);
-            font-size: 7px;
-            font-family: 'Press Start 2P', monospace;
+        .game-image-container img {
+            display: block; width: 100%; height: 100%;
+            object-fit: cover; object-position: center;
+            background: var(--surface-2);
         }
-        
+
+        /* Badge đè trên ảnh: platform góc trái · popular góc phải · downloaded góc dưới trái */
+        .platform-badge, .popular-badge, .downloaded-badge {
+            position: absolute; z-index: 2;
+            display: inline-flex; align-items: center;
+            height: 20px; padding: 0 8px;
+            border-radius: 999px;
+            font-size: 10px; font-weight: 800; letter-spacing: .4px; line-height: 1;
+            white-space: nowrap; pointer-events: none;
+        }
+        .platform-badge {
+            top: 8px; left: 8px; max-width: 46%;
+            overflow: hidden; text-overflow: ellipsis; display: block; line-height: 18px;
+            background: rgba(11, 7, 20, .72); color: var(--text);
+            border: 1px solid rgba(255, 255, 255, .16);
+            -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+        }
+        /* JS xuất "🔥 Popular": ẩn emoji, vẽ lại chữ POPULAR bằng ::after */
         .popular-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: linear-gradient(45deg, #FF6B6B, #FFE66D);
-            color: #392467;
-            font-size: 6px;
-            font-family: 'Press Start 2P', monospace;
-            font-weight: bold;
-            padding: 3px 6px;
-            border-radius: 8px;
-            border: 1px solid #ffffff;
-            box-shadow: 0 0 6px rgba(255, 107, 107, 0.7);
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            animation: pulse-glow 2s infinite;
-            z-index: 10;
+            top: 8px; right: 8px;
+            background: var(--purple); color: #fff;
+            font-size: 0;
         }
-        
-        @keyframes pulse-glow {
-            0%, 100% {
-                box-shadow: 0 0 6px rgba(255, 107, 107, 0.7);
-                transform: scale(1);
-            }
-            50% {
-                box-shadow: 0 0 12px rgba(255, 107, 107, 0.9);
-                transform: scale(1.05);
-            }
-        }
-        
+        .popular-badge::after { content: "POPULAR"; font-size: 9px; font-weight: 800; letter-spacing: .6px; }
         .downloaded-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: linear-gradient(45deg, #1AFF7A, #00D4AA);
-            color: #0f0f0f;
-            font-size: 6px;
-            font-family: 'Press Start 2P', monospace;
-            font-weight: bold;
-            padding: 3px 6px;
-            border-radius: 8px;
-            border: 1px solid #ffffff;
-            box-shadow: 0 0 8px rgba(26, 255, 122, 0.8);
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            animation: downloaded-pulse 2s infinite;
-            z-index: 10;
+            bottom: 8px; left: 8px;
+            background: rgba(11, 7, 20, .78); color: var(--accent);
+            border: 1px solid var(--accent-line);
+            -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+            text-transform: uppercase; font-size: 9px;
         }
-        
-        @keyframes downloaded-pulse {
-            0%, 100% {
-                box-shadow: 0 0 8px rgba(26, 255, 122, 0.8);
-                transform: scale(1);
-            }
-            50% {
-                box-shadow: 0 0 15px rgba(26, 255, 122, 1);
-                transform: scale(1.05);
-            }
-        }
-        
-        /* Downloaded button styling */
-        .download-btn.downloaded {
-            background: linear-gradient(45deg, #1AFF7A, #00D4AA);
-            color: #0f0f0f;
-            border-color: #1AFF7A;
-            box-shadow: 0 4px 15px rgba(26, 255, 122, 0.4), 0 2px 8px rgba(0, 0, 0, 0.4);
-        }
-        
-        .download-btn.downloaded:hover {
-            background: linear-gradient(45deg, #00D4AA, #1AFF7A);
-            box-shadow: 0 6px 20px rgba(26, 255, 122, 0.6), 0 3px 12px rgba(0, 0, 0, 0.5);
-            transform: translateY(-3px) scale(1.05);
-        }
-        
-        /* Light mode downloaded button */
-        body.light-mode .download-btn.downloaded {
-            background: linear-gradient(45deg, #1AFF7A, #00D4AA);
-            color: #0f0f0f;
-            border-color: #1AFF7A;
-            box-shadow: 0 0 10px rgba(26, 255, 122, 0.5), 0 2px 0 #00a0c0;
-        }
-        
-        body.light-mode .download-btn.downloaded:hover {
-            background: linear-gradient(45deg, #00D4AA, #1AFF7A);
-            box-shadow: 0 0 15px rgba(26, 255, 122, 0.7), 0 2px 0 #00a0c0;
-        }
-        
-        body.light-mode .downloaded-badge {
-            background: linear-gradient(45deg, #1AFF7A, #00D4AA);
-            color: #0f0f0f;
-            box-shadow: 0 0 10px rgba(26, 255, 122, 0.8);
-        }
-        
 
-        
-        /* Optimized download button */
+        /* Info: title + CTA, sát nhau */
+        .game-info {
+            flex: 1 1 auto;
+            display: flex; flex-direction: column;
+            padding: 8px 10px 10px;
+            min-width: 0;
+        }
+        .game-info h3 {
+            flex: 1 1 auto;
+            display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+            overflow: hidden; text-overflow: ellipsis; overflow-wrap: anywhere;
+            margin: 0 0 8px; padding: 0;
+            color: var(--text);
+            font-size: 13px; font-weight: 800; line-height: 1.3; letter-spacing: 0;
+            text-transform: none; text-shadow: none;
+        }
+        .game-info p { display: none; }
+
+        /* Download: ghost/tonal, phẳng. Hover/tap mới tô đầy vàng */
         .download-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            background: linear-gradient(45deg, #00d4ff, #0099cc);
-            color: #0f0f0f;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-family: 'Press Start 2P', monospace;
-            font-weight: bold;
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%; height: 34px; padding: 0 12px;
+            background: var(--accent-tint);
+            color: var(--accent);
+            border: 1px solid var(--accent-line);
+            border-radius: var(--r-sm);
+            font-size: 12px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; line-height: 1;
+            text-decoration: none; text-shadow: none; box-shadow: none;
             cursor: pointer;
-            border: 3px solid #ffffff;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.4);
-            position: relative;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            overflow: hidden;
+            transition: background-color .15s ease, color .15s ease, border-color .15s ease;
         }
-        
         .download-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-            transition: left 0.5s ease;
+            content: ""; flex: none; width: 14px; height: 14px;
+            background: currentColor;
+            -webkit-mask: var(--ic-download) no-repeat center / contain;
+            mask: var(--ic-download) no-repeat center / contain;
         }
-        
-        .download-btn.loading {
-            pointer-events: none;
-            background: linear-gradient(45deg, #cccccc, #999999);
-            color: #666666;
-            border-color: #cccccc;
+        .download-btn:active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+        @media (hover: hover) and (pointer: fine) {
+            .download-btn:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+            .game:hover { border-color: var(--purple); }
         }
-        
+        .download-btn.downloaded {
+            background: transparent; color: var(--muted); border-color: var(--line);
+        }
+        .download-btn.downloaded::before {
+            -webkit-mask-image: var(--ic-check); mask-image: var(--ic-check);
+        }
+        .download-btn.downloaded:active { background: var(--surface-2); color: var(--text); border-color: var(--line); }
+        @media (hover: hover) and (pointer: fine) {
+            .download-btn.downloaded:hover { background: var(--surface-2); color: var(--text); border-color: var(--line); }
+        }
+        .download-text { display: inline-block; }
+
         .download-spinner {
-            width: 10px;
-            height: 10px;
-            border: 1.5px solid transparent;
-            border-top: 1.5px solid currentColor;
+            display: none; flex: none;
+            width: 14px; height: 14px;
+            border: 2px solid transparent; border-top-color: currentColor; border-right-color: currentColor;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: none;
-            flex-shrink: 0;
+            animation: spin .8s linear infinite;
         }
-        
-        .download-btn.loading .download-spinner {
-            display: block;
-        }
-        
-        .download-btn.loading .download-text {
-            display: none;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Simplified button effects - only on desktop hover */
-        @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-            .download-btn::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-                transition: left 0.3s ease-out;
-                opacity: 0;
-            }
-            
-            .download-btn:hover::before {
-                left: 100%;
-                opacity: 1;
-            }
-        }
-        
-        /* Remove heavy animations on mobile/reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-            .download-btn::before,
-            .download-btn::after {
-                display: none;
-            }
-        }
-        
-        .download-btn:hover {
-            background: linear-gradient(45deg, #ff6b35, #ff4500);
-            color: #ffffff;
-            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5), 0 3px 12px rgba(0, 0, 0, 0.5);
-            transform: translateY(-3px) scale(1.05);
-        }
-        
-        .download-btn:hover::before {
-            left: 100%;
-        }
-        
-        .download-btn:hover::before {
-            animation: glitter-slide 1s infinite;
-        }
-        
-        /* Hiệu ứng cho các nút download khi hover */
-        .game:hover .download-btn {
-            background: #1AFF7A;
-            color: #392467;
-            box-shadow: 0 0 20px #1AFF7A, 0 0 40px #1AFF7A, 0 2px 0 var(--color-bg-secondary);
-            border-color: #ffffff;
-            transform: translateY(-2px) scale(1.05);
-        }
-        
+        .download-btn.loading { pointer-events: none; background: var(--surface-2); color: var(--muted); border-color: var(--line); }
+        .download-btn.loading::before { display: none; }
+        .download-btn.loading .download-spinner { display: block; }
+        .download-btn.loading .download-text { display: none; }
         .download-btn .ripple {
-            position: absolute;
-            border-radius: 50%;
-            transform: scale(0);
-            animation: ripple-effect 0.6s linear;
-            background: rgba(255,255,255,0.5);
-            pointer-events: none;
-            width: 100px;
-            height: 100px;
-            left: 50%;
-            top: 50%;
-            margin-left: -50px;
-            margin-top: -50px;
+            position: absolute; pointer-events: none;
+            width: 100px; height: 100px; left: 50%; top: 50%; margin: -50px 0 0 -50px;
+            border-radius: 50%; background: rgba(235, 250, 56, .28);
+            transform: scale(0); animation: ripple-effect .6s ease-out;
         }
-        
-        @keyframes ripple-effect {
-            to {
-                transform: scale(2.5);
-                opacity: 0;
-            }
-        }
-        
-        /* Responsive Styling for Tablets */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .sticky-search {
-                padding: 15px 0 8px 0;
-            }
-            
-            .search-bar-row {
-                flex-direction: column;
-                gap: 12px;
-            }
-            
-            .search-bar {
-                width: 100%;
-            }
-            
-            .search-bar input {
-                max-width: 100%;
-                font-size: 14px;
-                padding: 12px 15px;
-                text-align: center;
-            }
-            
-            .search-bar input:focus {
-                text-align: left;
-            }
-            
-            .filter-inline {
-                justify-content: center;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-            
-            .filter-inline select {
-                min-width: 120px;
-                padding: 12px 30px 12px 12px;
-            }
-            
-            .grid {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 15px;
-                margin-top: 20px;
-            }
-        
-            .game-info h3 {
-                font-size: 0.65em;
-            }
-        
-            .game-info p {
-                font-size: 6px;
-            }
-        
-            .download-btn {
-                font-size: 11px;
-                padding: 10px 16px;
-            }
-            
-            .download-spinner {
-                width: 9px;
-                height: 9px;
-            }
-            
-            .game img {
-                max-height: 180px;
-                aspect-ratio: 1/1;
-            }
-            
-            .toggle-view-btn {
-                padding: 8px 12px;
-            }
-        }
-        
-        /* Very Small Screens (Phones) */
-        @media (max-width: 480px) {
-            .container {
-                padding: 8px;
-            }
-            
-            /* Force hardware acceleration only when needed */
-            .game {
-                transform: none;
-                transition: none;
-            }
-            
-            .download-btn {
-                transform: none;
-                transition: none;
-            }
-            
-            .sticky-search {
-                padding: 15px 8px 10px 8px;
-                border-bottom: 3px solid var(--color-accent);
-                background: rgba(10, 10, 10, 0.98);
-                backdrop-filter: blur(12px);
-            }
-            
-            .search-bar-row {
-                gap: 12px;
-                align-items: stretch;
-            }
-            
-            .search-bar {
-                position: relative;
-                flex: 1;
-            }
-            
-            .search-bar input {
-                width: 100%;
-                padding: 14px 50px 14px 16px;
-                font-size: 13px;
-                border: 3px solid var(--color-accent);
-                border-radius: 8px;
-                background: rgba(26, 26, 26, 0.9);
-                color: #ffffff;
-                box-shadow: 0 0 12px rgba(0, 212, 255, 0.4), 0 3px 0 var(--color-accent2);
-                font-family: 'Press Start 2P', monospace;
-                font-weight: bold;
-                transition: all 0.3s ease;
-                text-align: center;
-            }
-            
-            .search-bar input:focus {
-                background: rgba(42, 42, 42, 0.9);
-                box-shadow: 0 0 20px rgba(255, 107, 53, 0.6), 0 3px 0 var(--color-accent2);
-                border-color: var(--color-accent2);
-                transform: translateY(-2px);
-                text-align: left;
-            }
-            
-            .search-bar input::placeholder {
-                color: rgba(255, 255, 255, 0.7);
-                font-size: 11px;
-            }
-            
-            .search-bar::after {
-                content: "🔍";
-                position: absolute;
-                right: 16px;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 16px;
-                pointer-events: none;
-                color: var(--color-accent);
-                text-shadow: 0 0 8px var(--color-accent);
-            }
-            
-            .filter-inline {
-                display: none !important;
-            }
-            
+        @keyframes ripple-effect { to { transform: scale(2.5); opacity: 0; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-            
-            .toggle-view-btn {
-                display: none !important;
-            }
-            
-            .grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-                margin-top: 15px;
-            }
-        
-            .game {
-                border: 2px solid var(--color-accent2);
-                box-shadow: 0 0 8px var(--color-accent2), 0 3px 0 var(--color-bg-secondary);
-            }
-        
-            .game-info {
-                padding: 12px 8px 10px 8px;
-            }
-        
-            .game-info h3 {
-                font-size: 0.55em;
-                min-height: 2em;
-                max-height: 2em;
-                margin-bottom: 6px;
-            }
-        
-            .game-info p {
-                font-size: 5px;
-                margin-bottom: 6px;
-            }
-            
-            .popular-badge {
-                font-size: 4px;
-                padding: 2px 4px;
-                border-radius: 6px;
-                top: 6px;
-                right: 6px;
-                border-width: 1px;
-            }
-            
-            .downloaded-badge {
-                font-size: 4px;
-                padding: 2px 4px;
-                border-radius: 6px;
-                top: 6px;
-                left: 6px;
-                border-width: 1px;
-            }
-        
-            .download-btn {
-                padding: 8px 12px;
-                font-size: 9px;
-                border-radius: 4px;
-                border: 2px solid #ffffff;
-            }
-            
-            .download-spinner {
-                width: 8px;
-                height: 8px;
-                border-width: 1px;
-            }
-            
-            .game img {
-                width: 100%;
-                aspect-ratio: 1 / 1 !important;
-                height: auto;
-                max-width: 100%;
-                max-height: none;
-                object-fit: cover;
-                image-rendering: pixelated;
-                background: #181824;
-                border-bottom: 2px solid var(--color-accent);
-                display: block;
-            }
-
-            .game.list-item .game-image-container {
-                width: 60px;
-                height: 60px;
-                min-width: 60px;
-                min-height: 60px;
-            }
-
-            #loading-overlay {
-                display: flex !important;
-                align-items: center;
-                justify-content: center;
-                width: 100vw;
-                height: 100vh;
-                min-height: 100vh;
-                position: fixed;
-                top: 0;
-                left: 0;
-                z-index: 9999;
-            }
-            
-            .pagination-btn {
-                padding: 6px 10px;
-                font-size: 11px;
-            }
-        }
-        .pagination-bar {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 32px 0 0 0;
-            gap: 8px;
-        }
-        .pagination-btn {
-            background: var(--color-card);
-            color: var(--color-text);
-            border: 2px solid var(--color-accent);
-            border-radius: 0;
-            padding: 7px 14px;
-            font-size: 13px;
-            font-family: 'Press Start 2P', monospace;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s, border 0.2s;
-            box-shadow: 0 2px 0 var(--color-accent2);
-        }
-        .pagination-btn.active, .pagination-btn:hover {
-            background: var(--color-accent);
-            color: var(--color-btn-text);
-            border: 2px solid var(--color-accent2);
-        }
-        .pagination-btn[disabled] {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .filter-inline select {
-            padding: 14px 32px 14px 14px;
-            border-radius: 0;
-            border: 3px solid var(--color-accent);
-            background: var(--color-card) url('data:image/svg+xml;utf8,<svg fill="%23ff36d0" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 12px center/18px 18px;
-            color: var(--color-text);
-            font-size: 14px;
-            min-width: 110px;
-            appearance: none;
-            outline: none;
-            font-family: 'Press Start 2P', monospace;
-            box-shadow: 0 0 8px var(--color-accent), 0 4px 0 var(--color-accent);
-        }
-        .filter-inline select:focus {
-            border: 3px solid var(--color-accent2);
-            background-color: var(--color-card-hover);
-            color: var(--color-text);
-            box-shadow: 0 0 12px var(--color-accent2), 0 4px 0 var(--color-accent2);
-        }
-        .toggle-view-btn {
-            margin-left: 18px;
-            padding: 10px 14px;
-            border-radius: 0;
-            border: 3px solid var(--color-accent);
-            background: var(--color-btn-text);
-            color: var(--color-accent);
-            font-size: 13px;
-            font-family: 'Press Start 2P', monospace;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 0 var(--color-accent);
-            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 0;
-        }
-        .toggle-view-btn svg {
-            width: 20px;
-            height: 20px;
-            display: block;
-        }
-        .toggle-view-btn.active, .toggle-view-btn:hover {
-            background: var(--color-accent);
-            color: var(--color-btn-text);
-            box-shadow: 0 4px 0 var(--color-accent2);
-        }
-        @media (max-width: 480px) {
-            .toggle-view-btn {
-                margin-left: 10px;
-                padding: 8px 10px;
-                box-shadow: 0 2px 0 var(--color-accent);
-            }
-
-        }
-        .list-view {
-            display: flex !important;
-            flex-direction: column;
-            gap: 18px !important;
-        }
-        .game.list-item {
-            display: flex;
-            align-items: center;
-            background: var(--color-E26EE5);
-            border: 4px solid var(--color-accent2);
-            border-radius: 0;
-            box-shadow: 0 0 10px var(--color-accent2), 0 6px 0 var(--color-bg-secondary);
-            padding: 0;
-            gap: 0;
-            min-height: 120px;
-        }
+        /* ---------- List view (nút toggle) ---------- */
+        .list-view { display: flex !important; flex-direction: column; gap: 8px; }
+        .game.list-item { flex-direction: row; align-items: center; gap: 10px; padding: 8px; border-radius: var(--r-md); }
         .game.list-item .game-image-container {
-            width: 90px;
-            height: 90px;
-            min-width: 90px;
-            min-height: 90px;
-            position: relative;
-            border-right: 2px solid var(--color-accent);
-            border-radius: 0;
+            flex: 0 0 64px; width: 64px; height: 64px; aspect-ratio: 1 / 1;
+            border-radius: var(--r-sm);
         }
-        
-        .game.list-item img {
-            width: 100%;
-            height: 100%;
-            aspect-ratio: 1/1;
-            object-fit: cover;
-            image-rendering: pixelated;
-            background: #0a0a0a;
-            border-bottom: none;
-            border-radius: 0;
-            display: block;
-        }
-        .game.list-item .game-info {
-            flex: 1;
-            text-align: left;
-            padding: 10px 18px;
-        }
-        .game.list-item .game-info h3 {
-            font-size: 0.85em;
-            margin: 0 0 6px 0;
-            min-height: unset;
-            max-height: unset;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .game.list-item .download-btn {
-            margin-left: 18px;
-            padding: 10px 18px;
-            font-size: 13px;
-        }
-        @media (max-width: 480px) {
-            .toggle-view-btn {
-                display: none !important;
-            }
-            .game.list-item img {
-                width: 60px;
-                height: 60px;
-                min-width: 60px;
-                min-height: 60px;
-            }
-        }
+        .game.list-item .platform-badge { top: 4px; left: 4px; height: 16px; line-height: 14px; padding: 0 6px; font-size: 9px; max-width: 80%; }
+        .game.list-item .popular-badge { top: auto; bottom: 4px; right: 4px; width: 16px; height: 16px; padding: 0; justify-content: center; }
+        .game.list-item .popular-badge::after { content: "\2605"; font-size: 10px; letter-spacing: 0; }
+        .game.list-item .downloaded-badge { display: none; }
+        .game.list-item .game-info { flex-direction: row; align-items: center; gap: 10px; padding: 0; }
+        .game.list-item .game-info h3 { margin: 0; flex: 1 1 auto; min-width: 0; }
+        .game.list-item .download-btn { flex: 0 0 auto; width: auto; min-width: 104px; margin: 0; height: 36px; }
 
-        .loading-bbl {
-            text-align: center;
-            margin-top: 32px;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 1.3em;
-            color: var(--color-accent);
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 0 var(--color-accent2);
-            user-select: none;
+        /* ---------- Pagination ---------- */
+        .pagination-bar {
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+            gap: 6px; margin: 16px 0 0; padding: 0;
         }
-        /* Optimized grid pattern - only on desktop */
-        @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-            body::before {
-                content: "";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-image: linear-gradient(0deg, transparent 24%, rgba(58, 224, 233, 0.02) 25%, rgba(58, 224, 233, 0.02) 26%, transparent 27%, transparent 74%, rgba(58, 224, 233, 0.02) 75%, rgba(58, 224, 233, 0.02) 76%, transparent 77%, transparent);
-                background-size: 100px 100px;
-                z-index: -1;
-            }
-        }
-        
-        /* Simplified scanline - desktop only and reduced opacity */
-        @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-            body::after {
-                content: "";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 0, 0, 0.05) 3px, rgba(0, 0, 0, 0.05) 4px);
-                pointer-events: none;
-                z-index: 9999;
-                opacity: 0.15;
-            }
-        }
-        
-        /* CSS cho background gradient trong chế độ Light */
-        body.light-mode {
-            background-image: linear-gradient(0deg, #f6f2ff 0%, #eee2ff 100%);
-        }
-        
-        /* Thêm grid pattern khác cho Light mode */
-        body.light-mode::before {
-            background-image: linear-gradient(0deg, transparent 24%, rgba(82, 0, 255, 0.03) 25%, rgba(82, 0, 255, 0.03) 26%, transparent 27%, transparent 74%, rgba(82, 0, 255, 0.03) 75%, rgba(82, 0, 255, 0.03) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(82, 0, 255, 0.03) 25%, rgba(82, 0, 255, 0.03) 26%, transparent 27%, transparent 74%, rgba(82, 0, 255, 0.03) 75%, rgba(82, 0, 255, 0.03) 76%, transparent 77%, transparent);
-        }
-        
-        /* Giảm độ tối của scanline trong Light mode */
-        body.light-mode::after {
-            opacity: 0.15;
-        }
-        
-        /* Hiệu ứng glow cho cards trong Light mode */
-        body.light-mode .game {
-            background: #280064;
-            border: 4px solid #ff006f;
-            box-shadow: 0 0 10px rgba(255, 0, 111, 0.3), 0 6px 0 #00a0c0;
-        }
-        
-        body.light-mode .game:hover {
-            background: #3b0a8c;
-            border: 4px solid #ff006f;
-            box-shadow: 0 0 15px rgba(255, 0, 111, 0.5), 0 12px 0 #00a0c0;
-        }
-        
-        /* Tăng độ tương phản cho text trong card */
-        body.light-mode .game-info h3 {
-            color: #ffffff;
-            text-shadow: 1px 1px 0 #000000;
-            font-weight: bold;
-        }
-        
-        body.light-mode .game-info p {
-            color: #ff70e5;
-        }
-        
-        /* Thêm viền ngăn cách cho các card */
-        body.light-mode .game {
-            position: relative;
-        }
-        
-        body.light-mode .game:after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: -1px;
-            right: -1px;
-            height: 4px;
-            background: linear-gradient(90deg, #ff006f, #00a0c0);
-            z-index: 1;
-        }
-        
-        /* Light mode games have consistent styling */
-        
-
-        
-        /* Điều chỉnh màu search và filter trong Light mode */
-        body.light-mode .search-bar input {
-            background: #ffffff;
-            border-color: #ff006f;
-            color: #280064;
-            box-shadow: 0 0 8px rgba(255, 0, 111, 0.3), 0 4px 0 #ff006f;
-        }
-        
-        body.light-mode .search-bar input::placeholder {
-            color: #8f45c7;
-        }
-        
-        body.light-mode .filter-inline select {
-            background-color: rgba(255, 255, 255, 0.8);
-            background-image: url('data:image/svg+xml;utf8,<svg fill="%23ff006f" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-            color: #280064;
-            border-color: #ff006f;
-            box-shadow: 0 0 8px rgba(255, 0, 111, 0.3), 0 4px 0 #ff006f;
-        }
-        
-        body.light-mode .filter-inline label {
-            color: #ff006f;
-            text-shadow: 0 0 3px rgba(255, 0, 111, 0.3);
-            font-weight: bold;
-        }
-        
-        /* Hiệu ứng khác cho nút trong Light mode */
-        body.light-mode .download-btn {
-            background: #ff006f;
-            box-shadow: 0 0 8px rgba(255, 0, 111, 0.5), 0 2px 0 #00a0c0;
-            border-color: #ff006f;
-            animation: neon-pulse-light 1.5s infinite alternate;
-        }
-        
-        @keyframes neon-pulse-light {
-            0% {
-                box-shadow: 0 0 8px rgba(255, 0, 111, 0.5), 0 2px 0 #00a0c0;
-                background: #ff006f;
-                border-color: #ff006f;
-            }
-            100% {
-                box-shadow: 0 0 20px rgba(255, 0, 111, 0.7), 0 0 30px rgba(255, 0, 111, 0.4), 0 2px 0 #00a0c0;
-                background: #ff4b9b;
-                border-color: #ffffff;
-            }
-        }
-        
-        body.light-mode .sticky-search {
-            background: rgba(233, 220, 255, 0.8);
-            background-image: linear-gradient(90deg, rgba(233, 220, 255, 0.9) 0%, rgba(216, 193, 255, 0.9) 100%);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 4px 10px rgba(40, 0, 100, 0.1);
-            border-bottom: 4px solid #ff006f;
-        }
-        
-
-        
-        /* Thêm style cho theme-toggle-btn trong Light mode */
-        body.light-mode .theme-toggle-btn {
-            background: #ffffff;
-            color: #ff006f;
-            border: 2px solid #ff006f;
-            box-shadow: 0 0 8px rgba(255, 0, 111, 0.3), 0 2px 0 #00a0c0;
-        }
-        
-        body.light-mode .theme-toggle-btn:hover {
-            background: #ff006f;
-            color: #ffffff;
-            box-shadow: 0 0 12px rgba(255, 0, 111, 0.5), 0 2px 0 #00a0c0;
-        }
-        
-        /* Style cho hot-category-btn trong Light mode */
-        body.light-mode .hot-category-btn {
-            background: #ffffff;
-            color: #280064;
-            border: 2px solid #280064;
-            box-shadow: 0 0 5px rgba(40, 0, 100, 0.3), 0 2px 0 #280064;
-        }
-        
-        body.light-mode .hot-category-btn.active,
-        body.light-mode .hot-category-btn:hover {
-            background: #280064;
-            color: #ffffff;
-            box-shadow: 0 0 10px rgba(40, 0, 100, 0.5), 0 2px 0 #00a0c0;
-            border-color: #ff006f;
-        }
-        
-        /* Style cho pagination-btn trong Light mode */
-        body.light-mode .pagination-btn {
-            background: #ffffff;
-            color: #280064;
-            border: 2px solid #280064;
-            box-shadow: 0 0 5px rgba(40, 0, 100, 0.3), 0 2px 0 #280064;
-        }
-        
-        body.light-mode .pagination-btn.active,
-        body.light-mode .pagination-btn:hover {
-            background: #280064;
-            color: #ffffff;
-            box-shadow: 0 0 10px rgba(40, 0, 100, 0.5), 0 2px 0 #00a0c0;
-            border-color: #ff006f;
-        }
-        
-        /* Style cho toggle-view-btn trong Light mode */
-        body.light-mode .toggle-view-btn {
-            background: #ffffff;
-            color: #280064;
-            border: 3px solid #280064;
-            box-shadow: 0 0 8px rgba(40, 0, 100, 0.3), 0 4px 0 #280064;
-        }
-        
-        body.light-mode .toggle-view-btn.active,
-        body.light-mode .toggle-view-btn:hover {
-            background: #280064;
-            color: #ffffff;
-            box-shadow: 0 0 12px rgba(40, 0, 100, 0.5), 0 4px 0 #00a0c0;
-            border-color: #ff006f;
-        }
-        
-        /* Thêm style cho theme-toggle-btn trong Light mode */
-        body.light-mode .theme-toggle-btn {
-            background: #ffffff;
-            color: #280064;
-            border: 2px solid #280064;
-            box-shadow: 0 0 8px rgba(40, 0, 100, 0.3), 0 2px 0 #280064;
-        }
-        
-        body.light-mode .theme-toggle-btn:hover {
-            background: #280064;
-            color: #ffffff;
-            box-shadow: 0 0 12px rgba(40, 0, 100, 0.5), 0 2px 0 #00a0c0;
-        }
-        
-        /* Điều chỉnh màu cho filter */
-        body.light-mode .filter-inline label {
-            color: #280064;
-            text-shadow: none;
-            font-weight: bold;
-        }
-        
-        body.light-mode .filter-inline select {
-            background-color: #ffffff;
-            background-image: url('data:image/svg+xml;utf8,<svg fill="%23280064" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-            color: #280064;
-            border-color: #280064;
-            box-shadow: 0 0 8px rgba(40, 0, 100, 0.3), 0 4px 0 #280064;
-        }
-        
-        body.light-mode .filter-inline select:focus {
-            border-color: #ff006f;
-            box-shadow: 0 0 12px rgba(255, 0, 111, 0.5), 0 4px 0 #ff006f;
-        }
-        
-
-        
-        /* Điều chỉnh màu list-item trong Light mode */
-        body.light-mode .game.list-item {
-            background: #280064;
-        }
-        
-        body.light-mode .game.list-item:hover {
-            background: #3b0a8c;
-        }
-        
-        /* Cải thiện transition giữa chế độ Light và Dark */
-        *, *:before, *:after {
-            transition: background-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease, border-color 0.5s ease, background-image 0.5s ease;
-        }
-        
-        /* Ẩn grid pattern trong Light mode để tăng độ tương phản */
-        body.light-mode::before {
-            opacity: 0.3;
-        }
-        
-        /* Giảm đậm scanline */
-        body.light-mode::after {
-            opacity: 0.08;
-        }
-        
-        /* Thêm style cho theme-toggle-btn trong Light mode */
-        body.light-mode .theme-toggle-btn {
-            background: #ffffff;
-            color: #280064;
-            border: 2px solid #280064;
-            box-shadow: 0 0 8px rgba(40, 0, 100, 0.3), 0 2px 0 #280064;
-        }
-        
-        body.light-mode .theme-toggle-btn:hover {
-            background: #280064;
-            color: #ffffff;
-            box-shadow: 0 0 12px rgba(40, 0, 100, 0.5), 0 2px 0 #00a0c0;
-            border-color: #ff006f;
-        }
-        
-        /* Điều chỉnh thêm style cho image trong thẻ game */
-        body.light-mode .game img {
-            border-bottom-color: #ff006f;
-        }
-        
-        /* Hiệu ứng đặc biệt cho nút download trong các thẻ game */
-        body.light-mode .game:hover .download-btn {
-            background: #ff006f;
-            box-shadow: 0 0 15px rgba(255, 0, 111, 0.7), 0 2px 0 #00a0c0;
-        }
-        
-        /* All game cards have consistent styling */
-        
-
-        
-        /* Consistent game card styling without special effects */
-        
-        /* Text styling is handled by main .game-info rules */
-        
-        /* Download button hover effects are handled by main .download-btn:hover rule */
-        
-
-        
-        /* List view styling - consistent with grid view */
-        .game.list-item {
-            background: #1e1e1e;
-        }
-        
-        .game.list-item:hover {
-            background: #2a2a2a;
-        }
-        
-        /* Hiệu ứng cho sidebar và các nút khác */
-        .theme-toggle-btn {
-            background: var(--color-bg-secondary);
-            color: var(--color-accent2);
-            border: 2px solid var(--color-accent2);
-            box-shadow: 0 2px 0 var(--color-accent);
-        }
-        
-        .theme-toggle-btn:hover {
-            background: var(--color-accent2);
-            color: var(--color-btn-text);
-            box-shadow: 0 2px 0 var(--color-accent);
-        }
-        
-        .hot-category-btn {
-            background: var(--color-bg-secondary);
-            color: var(--color-accent2);
-            border: 2px solid var(--color-accent2);
-            box-shadow: 0 2px 0 var(--color-accent);
-        }
-        
-        .hot-category-btn.active, .hot-category-btn:hover {
-            background: var(--color-accent2);
-            color: var(--color-btn-text);
-            box-shadow: 0 2px 0 var(--color-accent);
-        }
-        
+        .pagination-bar span { color: var(--muted); padding: 0 2px; }
         .pagination-btn {
-            background: var(--color-bg-secondary);
-            color: var(--color-accent2);
-            border: 2px solid var(--color-accent2);
-            box-shadow: 0 2px 0 var(--color-accent);
+            min-width: 36px; height: 36px; padding: 0 10px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--surface); color: var(--text);
+            border: 1px solid var(--line); border-radius: var(--r-sm);
+            font-family: var(--font-display); font-size: 14px; letter-spacing: .5px; line-height: 1;
+            cursor: pointer; box-shadow: none;
+            transition: background-color .15s ease, color .15s ease, border-color .15s ease;
         }
-        
-        .pagination-btn.active, .pagination-btn:hover {
-            background: var(--color-accent2);
-            color: var(--color-btn-text);
-            box-shadow: 0 2px 0 var(--color-accent);
-        }
-        
+        .pagination-btn:active { background: var(--surface-2); }
+        .pagination-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+        .pagination-btn:disabled { opacity: .35; pointer-events: none; }
 
-    </style>
-    <!-- ===== APP THEME OVERRIDE (vàng #EBFA38 + dark + Anton/Manrope, phẳng bo tròn) ===== -->
-    <style>
-        :root{
-            --color-bg:#0B0714; --color-bg-secondary:#17122A; --color-text:#FFFFFF;
-            --color-accent:#EBFA38; --color-accent2:#6C4FD0;
-            --color-card:#17122A; --color-card-hover:#1C1636;
-            --color-btn:#EBFA38; --color-btn-hover:#6C4FD0;
-            --color-btn-text:#0B0714; --color-btn-text-hover:#FFFFFF; --color-btn-glow:#EBFA38;
+        /* ---------- CTA / chip phụ ---------- */
+        .retry-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            height: 40px; padding: 0 20px;
+            background: var(--accent); color: var(--bg);
+            border: 0; border-radius: var(--r-md);
+            font-size: 13px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
+            cursor: pointer; box-shadow: none;
         }
-        /* Font: bỏ pixel, dùng Manrope (nội dung) + Anton (tiêu đề/nút) như app */
-        body, body *{ font-family:'Manrope',-apple-system,"Segoe UI",Roboto,Arial,sans-serif !important; }
-        h1,h2,h3,.game-title,.download-btn,.download-text,.toggle-view-btn,
-        .hot-category-btn,.pagination-btn,.retry-btn{
-            font-family:'Anton',Impact,sans-serif !important; letter-spacing:.5px;
+        .retry-btn:active { background: #F4FF6A; }
+        .hot-category-btn {
+            display: inline-flex; align-items: center; height: 32px; padding: 0 14px;
+            background: var(--surface); color: var(--text);
+            border: 1px solid var(--line); border-radius: 999px;
+            font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: none;
         }
-        body{
-            background:#0B0714 !important;
-            background-image:
-                radial-gradient(1100px 560px at 50% -10%, rgba(108,79,208,.20), transparent 60%),
-                linear-gradient(180deg,#0B0714 0%,#0E0A18 100%) !important;
-            background-attachment:fixed !important;
-        }
-        /* Nút: phẳng, bo tròn, nền vàng + chữ đen đậm (CTA giống app) */
-        .download-btn,.toggle-view-btn,.hot-category-btn,.pagination-btn,.retry-btn{
-            background:var(--color-accent) !important; color:#0B0714 !important;
-            border:none !important; border-radius:14px !important;
-            box-shadow:none !important; text-transform:uppercase;
-        }
-        .download-btn::before,.download-btn::after{ display:none !important; content:none !important; }
-        .download-btn:hover,.toggle-view-btn:hover,.hot-category-btn:hover,
-        .pagination-btn:hover,.retry-btn:hover{
-            background:#F4FF6A !important; color:#0B0714 !important; transform:translateY(-1px);
-            box-shadow:0 6px 18px rgba(235,250,56,.28) !important;
-        }
-        .pagination-btn.active{ background:#6C4FD0 !important; color:#fff !important; }
-        .download-btn.downloaded{ background:#2E2546 !important; color:#EBFA38 !important; }
-        .download-btn.downloaded:hover{ background:#38305A !important; color:#EBFA38 !important; }
-        /* Thẻ game */
-        .game,.list-item{
-            background:var(--color-card) !important; border:1px solid #2E2546 !important;
-            border-radius:16px !important; box-shadow:0 8px 24px rgba(0,0,0,.35) !important;
-        }
-        .game:hover,.list-item:hover{ border-color:#6C4FD0 !important; }
-        /* Header + ô tìm kiếm */
-        .sticky-search{
-            background:rgba(11,7,20,.92) !important;
-            background-image:none !important;
-            border-bottom:2px solid #2E2546 !important;
-            box-shadow:0 2px 16px rgba(0,0,0,.5) !important;
-        }
-        .search-bar input{
-            background:#17122A !important; color:#fff !important;
-            border:1px solid #2E2546 !important; border-radius:12px !important;
-            box-shadow:none !important; letter-spacing:normal !important;
-            text-align:left !important; font-family:'Manrope',sans-serif !important;
-        }
-        .search-bar input:focus{
-            border-color:#EBFA38 !important;
-            box-shadow:0 0 0 2px rgba(235,250,56,.22) !important; text-align:left !important;
-        }
-        .search-bar input::placeholder{
-            color:#9A95AD !important; font-family:'Manrope',sans-serif !important;
-            font-style:normal !important; letter-spacing:normal !important;
-        }
-        /* Hàng filter Platform/Region: phẳng, bỏ glow/pixel */
-        .filter-inline label{
-            color:#9A95AD !important; text-shadow:none !important;
-            font-family:'Manrope',sans-serif !important;
-        }
-        .filter-inline select{
-            background:#17122A !important; color:#fff !important;
-            border:1px solid #2E2546 !important; border-radius:10px !important;
-            box-shadow:none !important; text-shadow:none !important;
-            font-family:'Manrope',sans-serif !important;
-        }
-        .filter-inline select:focus{ border-color:#EBFA38 !important; box-shadow:none !important; }
-        /* Badge */
-        .popular-badge{ background:#6C4FD0 !important; color:#fff !important; border-radius:999px !important; }
-        .downloaded-badge{ background:#EBFA38 !important; color:#0B0714 !important; border-radius:999px !important; }
-        /* Link/accent chung */
-        a{ color:#EBFA38; }
-        ::selection{ background:#EBFA38; color:#0B0714; }
+        .hot-category-btn.active, .hot-category-btn:active { background: var(--accent-tint); color: var(--accent); border-color: var(--accent-line); }
 
-        /* ---- Tinh chỉnh dễ đọc + giảm ồn nút ---- */
-        /* Tên game: Manrope (Anton condensed khó đọc ở cỡ nhỏ), gọn chiều cao */
-        .game-info h3, .game-title{
-            font-family:'Manrope',sans-serif !important; font-weight:800 !important;
-            letter-spacing:0 !important; text-transform:none !important; line-height:1.25 !important;
-        }
-        .game-info p{ font-family:'Manrope',sans-serif !important; margin:4px 0 10px !important; }
-        /* Nút Download mỗi card = GHOST (viền vàng, nền trong) để bớt ồn khi lặp nhiều lần;
-           vẫn rõ là hành động chính, hover mới tô đầy vàng. CTA điều hướng giữ solid làm điểm nhấn. */
-        .download-btn, .download-text{
-            font-family:'Manrope',sans-serif !important; font-weight:800 !important;
-            letter-spacing:.5px !important;
-        }
-        .download-btn{
-            background:transparent !important; color:#EBFA38 !important;
-            border:1.5px solid rgba(235,250,56,.7) !important; box-shadow:none !important;
-            padding:10px 18px !important; text-transform:uppercase;
-        }
-        .download-btn:hover{
-            background:#EBFA38 !important; color:#0B0714 !important;
-            border-color:#EBFA38 !important; transform:translateY(-1px);
-        }
-        .download-btn.downloaded{
-            background:transparent !important; color:#9A95AD !important;
-            border-color:#2E2546 !important;
-        }
+        /* Trạng thái tải/lỗi do JS chèn vào #game-list */
+        .loading-spinner { margin-bottom: 12px; font-size: 28px; line-height: 1; }
 
-        /* ---- Card gọn: platform = BADGE trên ảnh, title to rõ, bớt khoảng trống ---- */
-        .platform-badge{
-            position:absolute !important; top:10px; left:10px; z-index:3;
-            background:rgba(11,7,20,.78); color:#EBFA38;
-            border:1px solid rgba(235,250,56,.45); border-radius:999px;
-            padding:4px 11px; font-size:11px; font-weight:800;
-            font-family:'Manrope',sans-serif; letter-spacing:.2px;
-            backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+        /* ---------- Loading overlay ---------- */
+        #loading-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg);
+            opacity: 1; visibility: visible;
+            transition: opacity .3s ease, visibility .3s ease;
         }
-        .game-info{ padding:12px 12px 14px !important; }
-        .game-info h3{
-            font-size:15px !important; line-height:1.3 !important;
-            min-height:0 !important; max-height:none !important;
-            margin:0 0 12px !important; text-shadow:none !important; color:#fff !important;
+        #loading-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loading-content { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px; text-align: center; }
+        .loading-text {
+            color: var(--text);
+            font-family: var(--font-display); font-size: 18px; letter-spacing: 1px; text-transform: uppercase; line-height: 1.2;
         }
-        .game-info p{ display:none !important; }   /* dòng Platform cũ nếu còn cache */
+        .pixel-spinner { display: grid; grid-template-columns: repeat(4, 8px); gap: 4px; }
+        .pixel-spinner div {
+            width: 8px; height: 8px; border-radius: 2px;
+            background: var(--purple); opacity: .25;
+            animation: dot-pulse 1.2s ease-in-out infinite;
+        }
+        .pixel-spinner div:nth-child(4n+1) { animation-delay: 0s; }
+        .pixel-spinner div:nth-child(4n+2) { animation-delay: .1s; }
+        .pixel-spinner div:nth-child(4n+3) { animation-delay: .2s; }
+        .pixel-spinner div:nth-child(4n)   { animation-delay: .3s; }
+        .pixel-spinner div:nth-child(n+5)  { animation-delay: .15s; }
+        .pixel-spinner div:nth-child(n+9)  { animation-delay: .3s; }
+        .pixel-spinner div:nth-child(n+13) { animation-delay: .45s; }
+        @keyframes dot-pulse { 0%, 100% { opacity: .25; background: var(--purple); } 50% { opacity: 1; background: var(--accent); } }
+        .reload-btn {
+            height: 36px; padding: 0 16px;
+            background: transparent; color: var(--muted);
+            border: 1px solid var(--line); border-radius: var(--r-sm);
+            font-size: 12px; font-weight: 700; letter-spacing: .3px; cursor: pointer; box-shadow: none;
+        }
+        .reload-btn:active { background: var(--surface); color: var(--text); }
 
-        /* ---- Icon search: emoji 🔍 -> SVG kính lúp muted (hết khập khiễng) ---- */
-        .search-bar::after{
-            content:"" !important; text-shadow:none !important;
-            width:18px !important; height:18px !important; right:18px !important;
-            background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239A95AD' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat center !important;
-            background-size:contain !important;
-        }
+        /* ---------- Rộng hơn (tablet / desktop preview) ---------- */
+        @media (min-width: 560px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (min-width: 820px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
-        /* ---- Lọc Platform/Region hiện trên MOBILE (đang bị display:none) ---- */
-        @media (max-width:768px){
-            .search-bar-row{ flex-wrap:wrap !important; row-gap:10px !important; }
-            .search-bar{ flex:1 1 100% !important; max-width:100% !important; }
-            .filter-inline{
-                display:flex !important; flex:1 1 100% !important; margin-left:0 !important;
-                align-items:center; justify-content:center; flex-wrap:wrap; gap:8px 10px !important;
-            }
-            .filter-inline label{ margin:0 2px 0 0 !important; }
-            .filter-inline select{ min-width:110px; padding:8px 10px !important; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
         }
-        /* mỗi cặp Platform/Region đi liền nhau, không vỡ dòng giữa cặp */
-        .filter-pair{ display:inline-flex !important; align-items:center; gap:6px; }
-        .platform-badge{ max-width:60%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     </style>
 </head>
 <body>
@@ -1697,7 +390,7 @@
                 <div></div><div></div><div></div><div></div>
             </div>
             <div class="loading-text">Loading games...</div>
-            <button class="reload-btn" onclick="reloadPage()">🔄 Reload Page</button>
+            <button class="reload-btn" onclick="reloadPage()">Reload page</button>
         </div>
     </div>
     
