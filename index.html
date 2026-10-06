@@ -1679,8 +1679,11 @@
                 align-items:center; justify-content:center; flex-wrap:wrap; gap:8px 10px !important;
             }
             .filter-inline label{ margin:0 2px 0 0 !important; }
-            .filter-inline select{ min-width:120px; padding:8px 10px !important; }
+            .filter-inline select{ min-width:110px; padding:8px 10px !important; }
         }
+        /* mỗi cặp Platform/Region đi liền nhau, không vỡ dòng giữa cặp */
+        .filter-pair{ display:inline-flex !important; align-items:center; gap:6px; }
+        .platform-badge{ max-width:60%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     </style>
 </head>
 <body>
@@ -1712,15 +1715,18 @@
                     </button>
                 </div>
                 <div class="filter-inline">
-                    <label for="platform-filter">Platform</label>
-                    <select id="platform-filter" onchange="filterGames()">
-                        <option value="">All</option>
-                    </select>
-                    <label for="region-filter" style="margin-left:18px;">Region</label>
-                    <select id="region-filter" onchange="filterGames()">
-                        <option value="">All</option>
-                    </select>
-
+                    <span class="filter-pair">
+                        <label for="platform-filter">Platform</label>
+                        <select id="platform-filter" onchange="filterGames()">
+                            <option value="">All</option>
+                        </select>
+                    </span>
+                    <span class="filter-pair">
+                        <label for="region-filter">Region</label>
+                        <select id="region-filter" onchange="filterGames()">
+                            <option value="">All</option>
+                        </select>
+                    </span>
                 </div>
             </div>
 

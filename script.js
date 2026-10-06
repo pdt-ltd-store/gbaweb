@@ -1,5 +1,6 @@
 // Array to store all games for searching
 let allGames = [];
+function platAbbr(p){ if(!p) return ""; var m={"Game Boy Advance":"GBA","Game Boy Color":"GBC","Game Boy":"GB","Nintendo 64":"N64","Super Nintendo":"SNES","Nintendo DS":"NDS"}; return m[p] || (p.length>8 ? p.replace(/[^A-Z0-9]/g,"").slice(0,4) : p); }
 let filteredGames = [];
 const GAMES_PER_PAGE = 50;
 let currentPage = 1;
@@ -396,7 +397,7 @@ function displayGames(games) {
         gameItem.innerHTML = isListView ? `
             <div class="game-image-container">
                 <img src="${game.thumbnail}" alt="${game.title}">
-                <div class="platform-badge">${game.platform}</div>
+                <div class="platform-badge">${platAbbr(game.platform)}</div>
                 ${popularBadge}
                 ${downloadedBadge}
             </div>
@@ -410,7 +411,7 @@ function displayGames(games) {
         ` : `
             <div class="game-image-container">
                 <img src="${game.thumbnail}" alt="${game.title}">
-                <div class="platform-badge">${game.platform}</div>
+                <div class="platform-badge">${platAbbr(game.platform)}</div>
                 ${popularBadge}
                 ${downloadedBadge}
             </div>
