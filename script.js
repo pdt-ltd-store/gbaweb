@@ -90,9 +90,10 @@ function afNormBase(s) {
     s = s.substring(s.lastIndexOf('/') + 1);
     return s.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
+// KHỚP CHÍNH XÁC (không substring) — tránh "GTA (USA)" khớp nhầm "GTA (USA) (GB Compatible)".
+// File .zip của card và .gba đã giải nén cùng base name ⇒ sau afNormBase là bằng nhau.
 function afLinkMatches(a, b) {
-    if (!a || !b) return false;
-    return a === b || a.indexOf(b) >= 0 || b.indexOf(a) >= 0;
+    return !!a && !!b && a === b;
 }
 
 // CẦU NỐI APP → WEB (1): app gọi khi MỘT ROM tải xong & hợp lệ ⇒ đánh dấu đúng card đó.
