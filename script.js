@@ -41,7 +41,15 @@ function saveDownloadedGame(game) {
     }
 }
 
+// Khi app ĐÃ đồng bộ danh sách ROM thật (mở trong app), đây là nguồn-sự-thật (mảng
+// basename đã chuẩn hoá). null = chưa sync (mở ở browser ngoài) ⇒ fallback localStorage.
+let afSyncedFiles = null;
+
 function isGameDownloaded(game) {
+    if (afSyncedFiles !== null) {
+        const lb = afNormBase(game.download_link);
+        return !!lb && afSyncedFiles.some(function (f) { return afLinkMatches(lb, f); });
+    }
     const downloadedGames = getDownloadedGames();
     const gameId = game.download_link || game.title;
     return downloadedGames.hasOwnProperty(gameId);
@@ -51,6 +59,84 @@ function getDownloadedGamesCount() {
     const downloadedGames = getDownloadedGames();
     return Object.keys(downloadedGames).length;
 }
+
+// Map id card hiện hành (download_link|title) → {game, gameItem, btn}, nạp lại mỗi lần render.
+const cardsByGameId = {};
+
+// Đánh dấu một card là 'Downloaded' + lưu localStorage. Dùng chung cho app-callback.
+function markCardDownloaded(entry) {
+    if (!entry || !entry.btn) return;
+    saveDownloadedGame(entry.game);
+    const btn = entry.btn;
+    if (!btn.classList.contains('downloaded')) {
+        btn.classList.add('downloaded');
+        const t = btn.querySelector('.download-text');
+        if (t) t.textContent = 'Downloaded';
+    }
+    const cont = entry.gameItem && entry.gameItem.querySelector('.game-image-container');
+    if (cont && !cont.querySelector('.downloaded-badge')) {
+        const badge = document.createElement('div');
+        badge.className = 'downloaded-badge';
+        badge.textContent = 'Downloaded';
+        cont.appendChild(badge);
+    }
+}
+
+// Chuẩn hoá về "basename không phần mở rộng, chỉ chữ+số" để khớp link ~ tên file mềm dẻo.
+function afNormBase(s) {
+    if (!s) return '';
+    try { s = decodeURIComponent(s); } catch (e) {}
+    s = String(s).split('?')[0].split('#')[0];
+    s = s.substring(s.lastIndexOf('/') + 1);
+    return s.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+function afLinkMatches(a, b) {
+    if (!a || !b) return false;
+    return a === b || a.indexOf(b) >= 0 || b.indexOf(a) >= 0;
+}
+
+// CẦU NỐI APP → WEB (1): app gọi khi MỘT ROM tải xong & hợp lệ ⇒ đánh dấu đúng card đó.
+// Khớp theo (1) id chính xác = download_link, rồi (2) basename link ~ fileName.
+window.__afMarkDownloaded = function (gameUrl, fileName) {
+    try {
+        if (gameUrl && cardsByGameId[gameUrl]) { markCardDownloaded(cardsByGameId[gameUrl]); return; }
+        const target = afNormBase(fileName) || afNormBase(gameUrl);
+        if (!target) return;
+        for (const id in cardsByGameId) {
+            if (afLinkMatches(afNormBase(cardsByGameId[id].game.download_link), target)) {
+                markCardDownloaded(cardsByGameId[id]);
+                return;
+            }
+        }
+    } catch (e) { console.error('__afMarkDownloaded', e); }
+};
+
+// CẦU NỐI APP → WEB (2): app gọi lúc load trang với DANH SÁCH ĐẦY ĐỦ file ROM thật trong máy.
+// Web DỰNG LẠI trạng thái 'Downloaded' = đúng các game có file thật ⇒ xoá nhãn cũ-giả
+// (vd bấm hụt lần trước), sửa triệt để lỗi "4 downloaded nhưng 2 ROM thật".
+window.__afSyncDownloaded = function (files) {
+    try {
+        // Nguồn-sự-thật: danh sách file ROM thật (chuẩn hoá). Áp cho MỌI render sau này
+        // qua isGameDownloaded ⇒ đúng kể cả khi gọi trước lúc games load xong.
+        afSyncedFiles = (Array.isArray(files) ? files : []).map(afNormBase).filter(Boolean);
+        // Ghi lại localStorage cho khớp (tiện khi mở lại), chỉ khi đã có danh sách game.
+        if (allGames && allGames.length) {
+            const newState = {};
+            allGames.forEach(function (g) {
+                if (isGameDownloaded(g)) {
+                    const id = g.download_link || g.title;
+                    newState[id] = { title: g.title, download_link: g.download_link, downloadedAt: new Date().toISOString() };
+                }
+            });
+            try { localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newState)); } catch (e) {}
+        }
+        // Vẽ lại trang hiện tại để card phản ánh đúng trạng thái vừa đối soát.
+        if (typeof filteredGames !== 'undefined' && filteredGames && filteredGames.length) {
+            displayGames(filteredGames);
+            if (typeof renderPagination === 'function') renderPagination(filteredGames.length, currentPage);
+        }
+    } catch (e) { console.error('__afSyncDownloaded', e); }
+};
 
 
 
@@ -373,6 +459,8 @@ function isPopularGame(gameTitle) {
 function displayGames(games) {
     const gameList = document.getElementById('game-list');
     gameList.innerHTML = '';
+    // Nạp lại map card cho lần render này (tránh giữ DOM cũ của trang trước).
+    for (const k in cardsByGameId) delete cardsByGameId[k];
     if (games.length === 0) {
         gameList.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #f357a8; font-size: 1.2em;">No games found.</div>';
         document.getElementById('pagination').innerHTML = '';
@@ -425,37 +513,17 @@ function displayGames(games) {
         `;
         setTimeout(() => {
             const btn = gameItem.querySelector('.download-btn');
+            // Đăng ký card theo id để app báo lại khi tải THÀNH CÔNG THẬT (window.__afMarkDownloaded).
+            const gameId = game.download_link || game.title;
+            cardsByGameId[gameId] = { game: game, gameItem: gameItem, btn: btn };
             btn.addEventListener('click', function(e) {
-                // Save download state to session storage
-                saveDownloadedGame(game);
-                
-                // Update button appearance immediately
-                if (!btn.classList.contains('downloaded')) {
-                    btn.classList.add('downloaded');
-                    const downloadTextSpan = btn.querySelector('.download-text');
-                    if (downloadTextSpan) {
-                        downloadTextSpan.textContent = 'Downloaded';
-                    }
-                    
-                    // Add downloaded badge to game card
-                    const gameImageContainer = gameItem.querySelector('.game-image-container');
-                    if (gameImageContainer && !gameImageContainer.querySelector('.downloaded-badge')) {
-                        const badge = document.createElement('div');
-                        badge.className = 'downloaded-badge';
-                        badge.textContent = 'Downloaded';
-                        gameImageContainer.appendChild(badge);
-                    }
-                }
-                
-                // Add loading state
+                // KHÔNG đánh dấu 'Downloaded' lúc bấm nữa — bấm ≠ tải xong.
+                // App sẽ gọi window.__afMarkDownloaded(url) khi file ROM tải xong & hợp lệ;
+                // lúc đó mới set 'Downloaded' + lưu localStorage (sửa lỗi "4 downloaded, 2 ROM thật").
+                // Chỉ giữ phản hồi bấm tức thì (loading + ripple).
                 btn.classList.add('loading');
-                
-                // Remove loading state after download starts (after a short delay)
-                setTimeout(() => {
-                    btn.classList.remove('loading');
-                }, 2000);
-                
-                // Ripple effect
+                setTimeout(() => { btn.classList.remove('loading'); }, 2000);
+
                 const ripple = document.createElement('span');
                 ripple.className = 'ripple';
                 const rect = btn.getBoundingClientRect();
