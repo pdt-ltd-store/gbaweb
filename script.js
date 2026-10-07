@@ -518,10 +518,15 @@ function displayGames(games) {
             const gameId = game.download_link || game.title;
             cardsByGameId[gameId] = { game: game, gameItem: gameItem, btn: btn };
             btn.addEventListener('click', function(e) {
-                // KHÔNG đánh dấu 'Downloaded' lúc bấm nữa — bấm ≠ tải xong.
-                // App sẽ gọi window.__afMarkDownloaded(url) khi file ROM tải xong & hợp lệ;
-                // lúc đó mới set 'Downloaded' + lưu localStorage (sửa lỗi "4 downloaded, 2 ROM thật").
-                // Chỉ giữ phản hồi bấm tức thì (loading + ripple).
+                // KHÔNG đánh dấu 'Downloaded' lúc bấm — bấm ≠ tải xong.
+                // Trong APP: chặn điều hướng (để webview tự mở link .zip thì bấm nhiều nhanh sẽ
+                // bị NUỐT, chỉ còn cái cuối) → đẩy TỪNG game qua cầu nối vào hàng đợi tải dần.
+                // App gọi __afMarkDownloaded(gameId) khi tải xong & hợp lệ.
+                if (window.AndroidDownloader && typeof AndroidDownloader.enqueueDownload === 'function' && game.download_link) {
+                    e.preventDefault();
+                    try { AndroidDownloader.enqueueDownload(gameId, game.download_link); } catch (err) { console.error(err); }
+                }
+                // Phản hồi bấm tức thì (loading + ripple). Browser ngoài: link vẫn mở bình thường.
                 btn.classList.add('loading');
                 setTimeout(() => { btn.classList.remove('loading'); }, 2000);
 
