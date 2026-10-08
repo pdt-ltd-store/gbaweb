@@ -312,6 +312,7 @@ async function loadGames(retryCount = 0, fileName = 'games.json') {
         filteredGames = sortedGames;
         populateFilters(sortedGames);
         displayGames(sortedGames);
+        applyUrlQuery();
         
         console.log(`✅ Successfully loaded ${validGames.length} games`);
         
@@ -524,7 +525,15 @@ function displayGames(games) {
                 // App gọi __afMarkDownloaded(gameId) khi tải xong & hợp lệ.
                 if (window.AndroidDownloader && typeof AndroidDownloader.enqueueDownload === 'function' && game.download_link) {
                     e.preventDefault();
-                    try { AndroidDownloader.enqueueDownload(gameId, game.download_link); } catch (err) { console.error(err); }
+                    try {
+                        // Gửi kèm thumbnail để app lưu & hiển thị bìa thật trong My Games.
+                        // Thử bản 3 tham số (app mới); app cũ chỉ có 2 tham số ⇒ fallback.
+                        try {
+                            AndroidDownloader.enqueueDownload(gameId, game.download_link, game.thumbnail || '');
+                        } catch (e3) {
+                            AndroidDownloader.enqueueDownload(gameId, game.download_link);
+                        }
+                    } catch (err) { console.error(err); }
                 }
                 // Phản hồi bấm tức thì (loading + ripple). Browser ngoài: link vẫn mở bình thường.
                 btn.classList.add('loading');
@@ -570,6 +579,25 @@ function filterGames() {
 // Search function (delegates to filter)
 function searchGames() {
     filterGames();
+}
+
+// Nhận keyword từ APP qua ?q= (header chung của app truyền sang) + ẩn ô search riêng của web
+// khi chạy trong app (AndroidDownloader tồn tại) để dồn không gian cho danh sách game.
+function applyUrlQuery() {
+    try {
+        const inApp = !!(window.AndroidDownloader && typeof AndroidDownloader.enqueueDownload === 'function');
+        const params = new URLSearchParams(location.search || '');
+        const q = params.get('q');
+        if (inApp) {
+            const bar = document.querySelector('.search-bar');
+            if (bar) bar.style.display = 'none';
+        }
+        if (q !== null && q !== undefined) {
+            const input = document.getElementById('search-input');
+            if (input) input.value = q;
+            filterGames();
+        }
+    } catch (e) { console.error('applyUrlQuery', e); }
 }
 
 function toggleView() {
