@@ -6,6 +6,57 @@ const GAMES_PER_PAGE = 50;
 let currentPage = 1;
 let isListView = false;
 
+// ===================== i18n: dịch GIAO DIỆN (KHÔNG dịch tên game / tên hệ máy / khu vực) =====================
+const I18N = {
+    en: { search: "Search for games...", platform: "Platform", region: "Region", all: "All", download: "Download", downloaded: "Downloaded", popular: "Popular", loading: "Loading games...", reload: "Reload page", nogames: "No games found." },
+    vi: { search: "Tìm game...", platform: "Hệ máy", region: "Khu vực", all: "Tất cả", download: "Tải về", downloaded: "Đã tải", popular: "Phổ biến", loading: "Đang tải game...", reload: "Tải lại trang", nogames: "Không tìm thấy game." },
+    es: { search: "Buscar juegos...", platform: "Plataforma", region: "Región", all: "Todos", download: "Descargar", downloaded: "Descargado", popular: "Popular", loading: "Cargando juegos...", reload: "Recargar página", nogames: "No se encontraron juegos." },
+    pt: { search: "Buscar jogos...", platform: "Plataforma", region: "Região", all: "Todos", download: "Baixar", downloaded: "Baixado", popular: "Popular", loading: "Carregando jogos...", reload: "Recarregar página", nogames: "Nenhum jogo encontrado." },
+    fr: { search: "Rechercher des jeux...", platform: "Plateforme", region: "Région", all: "Tous", download: "Télécharger", downloaded: "Téléchargé", popular: "Populaire", loading: "Chargement des jeux...", reload: "Recharger la page", nogames: "Aucun jeu trouvé." },
+    de: { search: "Spiele suchen...", platform: "Plattform", region: "Region", all: "Alle", download: "Herunterladen", downloaded: "Heruntergeladen", popular: "Beliebt", loading: "Spiele werden geladen...", reload: "Seite neu laden", nogames: "Keine Spiele gefunden." },
+    ru: { search: "Поиск игр...", platform: "Платформа", region: "Регион", all: "Все", download: "Скачать", downloaded: "Скачано", popular: "Популярное", loading: "Загрузка игр...", reload: "Обновить страницу", nogames: "Игры не найдены." },
+    hi: { search: "गेम खोजें...", platform: "प्लेटफ़ॉर्म", region: "क्षेत्र", all: "सभी", download: "डाउनलोड", downloaded: "डाउनलोड किया", popular: "लोकप्रिय", loading: "गेम लोड हो रहे हैं...", reload: "पेज रीलोड करें", nogames: "कोई गेम नहीं मिला।" },
+    id: { search: "Cari game...", platform: "Platform", region: "Wilayah", all: "Semua", download: "Unduh", downloaded: "Terunduh", popular: "Populer", loading: "Memuat game...", reload: "Muat ulang halaman", nogames: "Tidak ada game ditemukan." },
+    th: { search: "ค้นหาเกม...", platform: "แพลตฟอร์ม", region: "ภูมิภาค", all: "ทั้งหมด", download: "ดาวน์โหลด", downloaded: "ดาวน์โหลดแล้ว", popular: "ยอดนิยม", loading: "กำลังโหลดเกม...", reload: "โหลดหน้าใหม่", nogames: "ไม่พบเกม" },
+    zh: { search: "搜索游戏...", platform: "平台", region: "地区", all: "全部", download: "下载", downloaded: "已下载", popular: "热门", loading: "正在加载游戏...", reload: "重新加载页面", nogames: "未找到游戏。" },
+    "zh-tw": { search: "搜尋遊戲...", platform: "平台", region: "地區", all: "全部", download: "下載", downloaded: "已下載", popular: "熱門", loading: "正在載入遊戲...", reload: "重新載入頁面", nogames: "找不到遊戲。" },
+    ja: { search: "ゲームを検索...", platform: "プラットフォーム", region: "地域", all: "すべて", download: "ダウンロード", downloaded: "ダウンロード済み", popular: "人気", loading: "ゲームを読み込み中...", reload: "ページを再読み込み", nogames: "ゲームが見つかりません。" },
+    ko: { search: "게임 검색...", platform: "플랫폼", region: "지역", all: "전체", download: "다운로드", downloaded: "다운로드됨", popular: "인기", loading: "게임 로딩 중...", reload: "페이지 새로고침", nogames: "게임을 찾을 수 없습니다." }
+};
+function detectLang() {
+    try {
+        const cands = [];
+        const p = new URLSearchParams(location.search || '').get('lang');
+        if (p) cands.push(p);
+        if (navigator.languages) cands.push.apply(cands, navigator.languages);
+        cands.push(navigator.language || navigator.userLanguage || 'en');
+        for (let i = 0; i < cands.length; i++) {
+            let l = (cands[i] || '').toLowerCase();
+            if (!l) continue;
+            if (l.indexOf('zh') === 0) return (l.indexOf('tw') >= 0 || l.indexOf('hant') >= 0 || l.indexOf('hk') >= 0 || l.indexOf('mo') >= 0) ? 'zh-tw' : 'zh';
+            if (I18N[l]) return l;
+            let b = l.split('-')[0];
+            if (b === 'in') b = 'id'; // mã cũ của Indonesia
+            if (I18N[b]) return b;
+        }
+    } catch (e) { }
+    return 'en';
+}
+let LANG = detectLang();
+function t(k) { return (I18N[LANG] && I18N[LANG][k]) || I18N.en[k] || k; }
+function applyI18n() {
+    try {
+        const si = document.getElementById('search-input'); if (si) si.placeholder = t('search');
+        const pl = document.querySelector('label[for="platform-filter"]'); if (pl) pl.textContent = t('platform');
+        const rl = document.querySelector('label[for="region-filter"]'); if (rl) rl.textContent = t('region');
+        const po = document.querySelector('#platform-filter option[value=""]'); if (po) po.textContent = t('all');
+        const ro = document.querySelector('#region-filter option[value=""]'); if (ro) ro.textContent = t('all');
+        const rb = document.querySelector('.reload-btn'); if (rb) rb.textContent = t('reload');
+        document.querySelectorAll('.loading-text').forEach(function (e) { e.textContent = t('loading'); });
+        document.documentElement.setAttribute('lang', LANG);
+    } catch (e) { console.error('applyI18n', e); }
+}
+
 // Session Storage Keys
 const SESSION_STORAGE_KEY = 'downloadedGames';
 
@@ -65,21 +116,10 @@ const cardsByGameId = {};
 
 // Đánh dấu một card là 'Downloaded' + lưu localStorage. Dùng chung cho app-callback.
 function markCardDownloaded(entry) {
-    if (!entry || !entry.btn) return;
+    if (!entry || !entry.game) return;
     saveDownloadedGame(entry.game);
-    const btn = entry.btn;
-    if (!btn.classList.contains('downloaded')) {
-        btn.classList.add('downloaded');
-        const t = btn.querySelector('.download-text');
-        if (t) t.textContent = 'Downloaded';
-    }
-    const cont = entry.gameItem && entry.gameItem.querySelector('.game-image-container');
-    if (cont && !cont.querySelector('.downloaded-badge')) {
-        const badge = document.createElement('div');
-        badge.className = 'downloaded-badge';
-        badge.textContent = 'Downloaded';
-        cont.appendChild(badge);
-    }
+    // TỰ ĐỘNG ẨN game đã tải: lọc lại để card vừa tải biến mất khỏi danh sách.
+    if (typeof filterGames === 'function') filterGames();
 }
 
 // Chuẩn hoá về "basename không phần mở rộng, chỉ chữ+số" để khớp link ~ tên file mềm dẻo.
@@ -131,10 +171,9 @@ window.__afSyncDownloaded = function (files) {
             });
             try { localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newState)); } catch (e) {}
         }
-        // Vẽ lại trang hiện tại để card phản ánh đúng trạng thái vừa đối soát.
-        if (typeof filteredGames !== 'undefined' && filteredGames && filteredGames.length) {
-            displayGames(filteredGames);
-            if (typeof renderPagination === 'function') renderPagination(filteredGames.length, currentPage);
+        // Lọc lại để ẨN các game đã tải (đối soát từ app) khỏi danh sách.
+        if (allGames && allGames.length && typeof filterGames === 'function') {
+            filterGames();
         }
     } catch (e) { console.error('__afSyncDownloaded', e); }
 };
@@ -232,11 +271,11 @@ function populateFilters(games) {
     const regionFilter = document.getElementById('region-filter');
     // Populate platform
     const platforms = getUniqueValues(games, 'platform');
-    platformFilter.innerHTML = '<option value="">All</option>' +
+    platformFilter.innerHTML = `<option value="">${t('all')}</option>` +
         platforms.map(p => `<option value="${p}">${p}</option>`).join('');
     // Populate region
     const regions = getUniqueValues(games, 'region');
-    regionFilter.innerHTML = '<option value="">All</option>' +
+    regionFilter.innerHTML = `<option value="">${t('all')}</option>` +
         regions.map(r => `<option value="${r}">${r}</option>`).join('');
 }
 
@@ -309,9 +348,11 @@ async function loadGames(retryCount = 0, fileName = 'games.json') {
         const sortedGames = sortGamesByPopularity(validGames);
         
         allGames = sortedGames;
-        filteredGames = sortedGames;
         populateFilters(sortedGames);
-        displayGames(sortedGames);
+        applyI18n();
+        // Ẩn game đã tải ngay từ lần render đầu (theo localStorage / app sync).
+        filteredGames = sortedGames.filter(function (g) { return !isGameDownloaded(g); });
+        displayGames(filteredGames);
         applyUrlQuery();
         
         console.log(`✅ Successfully loaded ${validGames.length} games`);
@@ -464,7 +505,7 @@ function displayGames(games) {
     // Nạp lại map card cho lần render này (tránh giữ DOM cũ của trang trước).
     for (const k in cardsByGameId) delete cardsByGameId[k];
     if (games.length === 0) {
-        gameList.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #f357a8; font-size: 1.2em;">No games found.</div>';
+        gameList.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #f357a8; font-size: 1.2em;">${t('nogames')}</div>`;
         document.getElementById('pagination').innerHTML = '';
         return;
     }
@@ -479,10 +520,10 @@ function displayGames(games) {
         // Check if game is downloaded
         const isDownloaded = isGameDownloaded(game);
         const downloadedClass = isDownloaded ? 'downloaded' : '';
-        const downloadText = isDownloaded ? 'Downloaded' : 'Download';
-        
-        const popularBadge = isPopularGame(game.title) ? '<div class="popular-badge">🔥 Popular</div>' : '';
-        const downloadedBadge = isDownloaded ? '<div class="downloaded-badge">Downloaded</div>' : '';
+        const downloadText = isDownloaded ? t('downloaded') : t('download');
+
+        const popularBadge = isPopularGame(game.title) ? `<div class="popular-badge">🔥 ${t('popular')}</div>` : '';
+        const downloadedBadge = isDownloaded ? `<div class="downloaded-badge">${t('downloaded')}</div>` : '';
         
         gameItem.innerHTML = isListView ? `
             <div class="game-image-container">
@@ -565,9 +606,11 @@ function filterGames() {
             game.platform.toLowerCase().includes(searchQuery);
         const matchesPlatform = !platform || game.platform === platform;
         const matchesRegion = !region || game.region === region;
-        return matchesSearch && matchesPlatform && matchesRegion;
+        // TỰ ĐỘNG ẨN game đã tải: không hiện lại trong danh sách.
+        const notDownloaded = !isGameDownloaded(game);
+        return matchesSearch && matchesPlatform && matchesRegion && notDownloaded;
     });
-    
+
     // Sort filtered results by popularity
     filteredGames = sortGamesByPopularity(filtered);
     
@@ -669,6 +712,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Enhanced initialization with network detection
 function initializeApp() {
+    // Dịch UI ngay (placeholder/nhãn/nút/loading) trước khi tải game.
+    applyI18n();
     // Check if we're online
     if (!navigator.onLine) {
         showErrorMessage('No internet connection. Please check your network and try again.');
