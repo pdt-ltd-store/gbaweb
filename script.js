@@ -527,7 +527,7 @@ function displayGames(games) {
         
         gameItem.innerHTML = isListView ? `
             <div class="game-image-container">
-                <img src="${game.thumbnail}" alt="${game.title}">
+                <img src="${game.thumbnail}" alt="${game.title}" loading="lazy" decoding="async">
                 <div class="platform-badge">${platAbbr(game.platform)}</div>
                 ${popularBadge}
                 ${downloadedBadge}
@@ -541,7 +541,7 @@ function displayGames(games) {
             </div>
         ` : `
             <div class="game-image-container">
-                <img src="${game.thumbnail}" alt="${game.title}">
+                <img src="${game.thumbnail}" alt="${game.title}" loading="lazy" decoding="async">
                 <div class="platform-badge">${platAbbr(game.platform)}</div>
                 ${popularBadge}
                 ${downloadedBadge}
