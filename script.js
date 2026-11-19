@@ -118,8 +118,27 @@ const cardsByGameId = {};
 function markCardDownloaded(entry) {
     if (!entry || !entry.game) return;
     saveDownloadedGame(entry.game);
-    // TỰ ĐỘNG ẨN game đã tải: lọc lại để card vừa tải biến mất khỏi danh sách.
-    if (typeof filterGames === 'function') filterGames();
+    // HIỆN trạng thái 'Downloaded' NGAY trên đúng card đó (không ẩn, không re-render cả trang —
+    // giữ scroll + flip tức thì khi tải xong mà user vẫn đứng ở trang).
+    try {
+        const btn = entry.btn;
+        if (btn) {
+            btn.classList.remove('loading');
+            btn.classList.add('downloaded');
+            const txt = btn.querySelector('.download-text');
+            if (txt) txt.textContent = t('downloaded');
+        }
+        const gi = entry.gameItem;
+        if (gi && !gi.querySelector('.downloaded-badge')) {
+            const cont = gi.querySelector('.game-image-container');
+            if (cont) {
+                const b = document.createElement('div');
+                b.className = 'downloaded-badge';
+                b.textContent = t('downloaded');
+                cont.appendChild(b);
+            }
+        }
+    } catch (e) { console.error('markCardDownloaded', e); }
 }
 
 // Chuẩn hoá về "basename không phần mở rộng, chỉ chữ+số" để khớp link ~ tên file mềm dẻo.
@@ -350,8 +369,8 @@ async function loadGames(retryCount = 0, fileName = 'games.json') {
         allGames = sortedGames;
         populateFilters(sortedGames);
         applyI18n();
-        // Ẩn game đã tải ngay từ lần render đầu (theo localStorage / app sync).
-        filteredGames = sortedGames.filter(function (g) { return !isGameDownloaded(g); });
+        // Hiện TẤT CẢ ngay từ lần render đầu — game đã tải render kèm badge 'Downloaded', không ẩn.
+        filteredGames = sortedGames;
         displayGames(filteredGames);
         applyUrlQuery();
         
@@ -606,9 +625,8 @@ function filterGames() {
             game.platform.toLowerCase().includes(searchQuery);
         const matchesPlatform = !platform || game.platform === platform;
         const matchesRegion = !region || game.region === region;
-        // TỰ ĐỘNG ẨN game đã tải: không hiện lại trong danh sách.
-        const notDownloaded = !isGameDownloaded(game);
-        return matchesSearch && matchesPlatform && matchesRegion && notDownloaded;
+        // KHÔNG ẩn game đã tải — hiện trong danh sách kèm badge 'Downloaded' (displayGames tự render).
+        return matchesSearch && matchesPlatform && matchesRegion;
     });
 
     // Sort filtered results by popularity
